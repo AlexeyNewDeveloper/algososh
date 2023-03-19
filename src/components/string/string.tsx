@@ -8,7 +8,6 @@ import { Button } from "../ui/button/button";
 import { useForm } from "../../hooks/useForm";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
-import { time } from "console";
 
 interface ILetter {
   letter: string;
@@ -25,7 +24,7 @@ export const StringComponent: React.FC = () => {
   }>({
     displayedTextArray: [],
   });
-  const { values, setValues, handleChange } = useForm<{
+  const { values, handleChange } = useForm<{
     text: string;
   }>({
     text: "",
