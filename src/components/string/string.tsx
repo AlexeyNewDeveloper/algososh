@@ -30,6 +30,24 @@ export const StringComponent: React.FC = () => {
     text: "",
   });
 
+  const swapLetter = (
+    arr: Array<any>,
+    firstIndex: number,
+    secondIndex: number
+  ) => {
+    if (firstIndex >= 1 && secondIndex < arr.length) {
+      arr[firstIndex - 1].changing = false;
+      arr[firstIndex - 1].modified = true;
+      if (arr[secondIndex + 1]) {
+        arr[secondIndex + 1].changing = false;
+        arr[secondIndex + 1].modified = true;
+      }
+    }
+    arr[firstIndex].changing = true;
+    arr[secondIndex].changing = true;
+    return swap(arr, firstIndex, secondIndex);
+  };
+
   const delaySwap = (
     str: Array<any>,
     start: number,
@@ -57,7 +75,7 @@ export const StringComponent: React.FC = () => {
         } else {
           setArrayText({
             ...arrayText,
-            displayedTextArray: swap(str, start, end),
+            displayedTextArray: swapLetter(str, start, end),
           });
         }
 
