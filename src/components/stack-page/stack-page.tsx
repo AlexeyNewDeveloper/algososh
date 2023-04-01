@@ -71,7 +71,7 @@ export const StackPage: React.FC = () => {
   const delay = (
     arr: Array<ILetter>,
     buttonName: string,
-    delay: number = 1000
+    delay: number = 500
   ) =>
     new Promise((res) =>
       setTimeout(() => {
