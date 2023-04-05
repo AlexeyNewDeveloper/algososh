@@ -21,12 +21,17 @@ export const FibonacciPage: React.FC = () => {
     number: null,
   });
 
-  async function fibIterative(n: number) {
+  function getFibonacciNumbers(n: number) {
     let arr: number[] = [1, 1];
-    let displayedArr: number[] = [];
     for (let i = 2; i < n + 1; i++) {
       arr.push(arr[i - 2] + arr[i - 1]);
     }
+    return arr;
+  }
+
+  async function showItems(n: number) {
+    let arr = getFibonacciNumbers(n);
+    let displayedArr: number[] = [];
     for (let i = 0; i < arr.length; i++) {
       displayedArr.push(arr[i]);
       await delay(() => {
@@ -45,7 +50,7 @@ export const FibonacciPage: React.FC = () => {
     setClickButton(true);
     setLoading(true);
     setValues({ number: null });
-    fibIterative(Number(values.number));
+    showItems(Number(values.number));
   };
 
   return (

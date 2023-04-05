@@ -8,174 +8,12 @@ import { Button } from "../ui/button/button";
 import { nanoid } from "nanoid";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
 import { IItemObject } from "../../types/types";
-import { isPressedButton } from "../../utils/utils";
+import { isPressedButton, randomArr } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { ElementStates } from "../../types/element-states";
+import { LinkedList } from "./linkedList";
 
-export class Node<T> {
-  value: T;
-  next: Node<T> | null;
-  constructor(value: T, next?: Node<T> | null) {
-    this.value = value;
-    this.next = next === undefined ? null : next;
-  }
-}
-
-interface ILinkedList<T> {
-  append: (element: T) => void;
-  insertAt: (element: T, position: number) => void;
-  getElementByindex: (index: number) => Node<T> | null | undefined;
-  deleteElementByIndex: (index: number) => Node<T> | null | undefined;
-  getSize: () => number;
-  print: () => void;
-}
-
-class LinkedList<T> implements ILinkedList<T> {
-  private head: Node<T> | null;
-  private size: number;
-  constructor() {
-    this.head = null;
-    this.size = 0;
-  }
-
-  append(element: T) {
-    const node = new Node(element);
-    let curr = this.head;
-    if (!this.head) {
-      this.head = node;
-    } else {
-      while (curr) {
-        if (!curr.next) {
-          curr.next = node;
-          break;
-        } else {
-          curr = curr.next;
-        }
-      }
-    }
-    this.size++;
-  }
-
-  insertAt(element: T, index: number) {
-    if (index < 0 || index > this.size) {
-      return;
-    } else {
-      const node = new Node(element);
-
-      if (index === 0) {
-        if (!this.head) {
-          this.head = node;
-        } else {
-          const temp = this.head;
-          this.head = node;
-          this.head.next = temp;
-        }
-      } else {
-        let curr = this.head;
-        let currIndex = 0;
-
-        while (currIndex <= index) {
-          if (curr) {
-            const tempNextIndex = curr.next;
-            currIndex++;
-            if (currIndex === index && tempNextIndex) {
-              node.next = tempNextIndex;
-              curr.next = node;
-              break;
-            }
-            curr = curr.next;
-          }
-        }
-      }
-
-      this.size++;
-    }
-  }
-
-  getElementByindex(index: number) {
-    if (index < 0 || index > this.size) {
-      return;
-    } else {
-      if (index === 0) {
-        return this.head;
-      } else {
-        let curr = this.head;
-        let currIndex = 0;
-
-        while (currIndex <= index) {
-          if (curr) {
-            const tempNextIndex = curr.next;
-            currIndex++;
-            if (currIndex === index && tempNextIndex) {
-              return tempNextIndex;
-            }
-            curr = curr.next;
-          }
-        }
-      }
-    }
-  }
-
-  deleteElementByIndex(index: number) {
-    if (this.head) {
-      let curr: Node<T> | null = this.head;
-      let i = 0;
-      if (i === index && !curr.next) {
-        const temp = curr;
-        this.head = null;
-        this.size--;
-        return temp;
-      }
-      while (curr) {
-        if (i === index) {
-          const temp = curr.next;
-          const tempDeleteElement = curr;
-          this.head = temp;
-          this.size--;
-          return tempDeleteElement;
-        } else {
-          curr = curr.next;
-          i++;
-        }
-      }
-      return;
-    }
-  }
-
-  getSize() {
-    return this.size;
-  }
-
-  print() {
-    let curr = this.head;
-    let res = "";
-    while (curr) {
-      res += `${curr.value} `;
-      curr = curr.next;
-    }
-    console.log(res);
-  }
-}
-
-const initialList = new LinkedList<IItemObject>();
-
-const getInitialList = (
-  initialArrayOfValues: Array<any>,
-  list: ILinkedList<IItemObject>
-) => {
-  let displayedArray: Array<IItemObject> = [];
-  for (let i = 0; i < initialArrayOfValues.length; i++) {
-    let value: IItemObject = {
-      value: initialArrayOfValues[i],
-      id: nanoid(),
-      changing: false,
-      modified: false,
-    };
-    displayedArray.push(value);
-    list.append(value);
-  }
-  return { displayedArray, list };
-};
+const list = new LinkedList<IItemObject>(randomArr(3, 6, 9999));
 
 type TClickButton = {
   [name: string]: boolean;
@@ -194,7 +32,7 @@ interface IChangingElement {
   toDelete: boolean;
 }
 
-const { displayedArray, list } = getInitialList([0, 34, 8, 1], initialList);
+// const { displayedArray, list } = getInitialList([0, 34, 8, 1], initialList);
 
 export const ListPage: React.FC = () => {
   const [changingElement, setChangingElement] =
@@ -210,7 +48,8 @@ export const ListPage: React.FC = () => {
   const [arrayText, setArrayText] = React.useState<{
     displayedTextArray: Array<IItemObject>;
   }>({
-    displayedTextArray: displayedArray,
+    displayedTextArray: list.toArray(),
+    // displayedTextArray: displayedArray,
   });
   const { values, handleChange, setValues } = useForm<{
     [name: string]: string | null;
@@ -313,7 +152,7 @@ export const ListPage: React.FC = () => {
       };
 
       if (position === "head") {
-        list.insertAt(insertedValue, 0);
+        list.addByIndex(insertedValue, 0);
         setChangingElement(currentChangingElement);
         await delay(displayChangingValue, arrayOfItems, insertedValue, 0);
         await delay(displayFinishChangingValue, arrayOfItems, insertedValue, 0);
@@ -339,7 +178,7 @@ export const ListPage: React.FC = () => {
         );
       }
       if (typeof position === "number") {
-        list.insertAt(insertedValue, position);
+        list.addByIndex(insertedValue, position);
 
         for (let i = 0; i <= position; i++) {
           await (() =>
@@ -403,7 +242,7 @@ export const ListPage: React.FC = () => {
       typeof positionIndex === "number" &&
       (position === "head" || position === "tail")
     ) {
-      list.deleteElementByIndex(positionIndex);
+      list.deleteByIndex(positionIndex);
       const deletedElement = Object.assign(
         {},
         arrayText.displayedTextArray[positionIndex]
@@ -427,7 +266,7 @@ export const ListPage: React.FC = () => {
         setChangingElement(null);
       }
     } else if (typeof position === "number") {
-      list.deleteElementByIndex(position);
+      list.deleteByIndex(position);
       const deletedElement = Object.assign(
         {},
         arrayText.displayedTextArray[position]

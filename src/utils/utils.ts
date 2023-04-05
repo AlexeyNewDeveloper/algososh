@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { ElementStates } from "../types/element-states";
 import { IItemObject } from "../types/types";
 
@@ -38,4 +39,12 @@ export const isPressedButton = (nameButtons: {
     }
   }
   return false;
+};
+
+export const randomArr = (min: number, max: number, maxValue: number) => {
+  const lengthArr = Math.floor(Math.random() * (max - min + 1)) + min;
+
+  return Array.from({ length: lengthArr }, () => {
+    return Math.floor(Math.random() * maxValue + 1);
+  });
 };
