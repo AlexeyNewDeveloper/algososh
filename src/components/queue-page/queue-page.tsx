@@ -2,7 +2,6 @@ import React from "react";
 import styles from "./queue-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Circle } from "../ui/circle/circle";
-import { ElementStates } from "../../types/element-states";
 import { useForm } from "../../hooks/useForm";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";

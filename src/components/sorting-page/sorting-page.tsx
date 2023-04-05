@@ -7,7 +7,6 @@ import { Button } from "../ui/button/button";
 import { Direction } from "../../types/direction";
 import { Column } from "../ui/column/column";
 import { swap } from "../../utils/utils";
-import { ElementStates } from "../../types/element-states";
 import { IItemObject } from "../../types/types";
 import { delay } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
