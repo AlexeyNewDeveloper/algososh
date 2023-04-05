@@ -501,6 +501,9 @@
 .mt-40 {
   margin-top: calc(var(--offset-base-size) * 40);
 }
+.mt-45 {
+  margin-top: calc(var(--offset-base-size) * 40);
+}
 
 .mb-1 {
   margin-bottom: var(--offset-base-size);
