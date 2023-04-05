@@ -1,0 +1,20 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.top_content {
+  display: flex;
+  width: 100%;
+  max-width: 829px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.result_box {
+  display: flex;
+  margin-top: 48px;
+  justify-content: center;
+  align-items: flex-end;
+}
