@@ -12,7 +12,7 @@ export const swap = (
   return arr;
 };
 
-export const circleStateBasedOn = (item: IItemObject) => {
+export const getCircleStateBasedOn = (item: IItemObject) => {
   return item.changing
     ? ElementStates.Changing
     : item.modified
@@ -28,3 +28,14 @@ export async function delay(func: () => void, delay: number) {
     }, delay)
   );
 }
+
+export const isPressedButton = (nameButtons: {
+  [name: string]: boolean;
+}): boolean => {
+  for (let key in nameButtons) {
+    if (nameButtons[key] === true) {
+      return true;
+    }
+  }
+  return false;
+};

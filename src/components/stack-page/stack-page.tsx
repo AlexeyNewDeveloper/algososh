@@ -6,14 +6,9 @@ import { Button } from "../ui/button/button";
 import { Input } from "../ui/input/input";
 import { Circle } from "../ui/circle/circle";
 import { useForm } from "../../hooks/useForm";
-import { ElementStates } from "../../types/element-states";
-
-interface ILetter {
-  letter: string;
-  id: string;
-  modified: boolean;
-  changing: boolean;
-}
+import { IItemObject } from "../../types/types";
+import { isPressedButton } from "../../utils/utils";
+import { getCircleStateBasedOn } from "../../utils/utils";
 
 interface IStack<T> {
   push: (item: T) => void;
@@ -47,7 +42,7 @@ export class Stack<T> implements IStack<T> {
   getSize = () => this.container.length;
 }
 
-const stack = new Stack<ILetter>();
+const stack = new Stack<IItemObject>();
 
 export const StackPage: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<{
@@ -58,7 +53,7 @@ export const StackPage: React.FC = () => {
     clear: false,
   });
   const [arrayText, setArrayText] = React.useState<{
-    displayedTextArray: Array<ILetter>;
+    displayedTextArray: Array<IItemObject>;
   }>({
     displayedTextArray: [],
   });
@@ -69,7 +64,7 @@ export const StackPage: React.FC = () => {
   });
 
   const delay = (
-    arr: Array<ILetter>,
+    arr: Array<IItemObject>,
     buttonName: string,
     delay: number = 500
   ) =>
@@ -89,12 +84,12 @@ export const StackPage: React.FC = () => {
     setValues({ text: null });
     setClickButton({ ...clickButton, add: true });
 
-    let insertedValue: ILetter | null = null;
-    let arrayOfItems: Array<ILetter> = [...arrayText.displayedTextArray];
+    let insertedValue: IItemObject | null = null;
+    let arrayOfItems: Array<IItemObject> = [...arrayText.displayedTextArray];
 
     if (values.text) {
       insertedValue = {
-        letter: values.text,
+        value: values.text,
         id: nanoid(),
         modified: false,
         changing: true,
@@ -124,8 +119,8 @@ export const StackPage: React.FC = () => {
   async function deleteValueButton() {
     setClickButton({ delete: true });
 
-    let lastElementInStack: ILetter | null = stack.peak();
-    let arr: Array<ILetter> = [...arrayText.displayedTextArray];
+    let lastElementInStack: IItemObject | null = stack.peak();
+    let arr: Array<IItemObject> = [...arrayText.displayedTextArray];
     if (lastElementInStack) {
       lastElementInStack.changing = true;
       arr[arr.length - 1] = lastElementInStack;
@@ -137,14 +132,6 @@ export const StackPage: React.FC = () => {
 
     setArrayText({ displayedTextArray: [...arr] });
   }
-
-  const isPressedButton = () => {
-    for (let key in clickButton) {
-      if (clickButton[key] === true) {
-        return true;
-      }
-    }
-  };
 
   return (
     <SolutionLayout title="Стек">
@@ -164,7 +151,7 @@ export const StackPage: React.FC = () => {
             text="Добавить"
             extraClass="mr-6"
             onClick={addValueButton}
-            disabled={!values.text || isPressedButton()}
+            disabled={!values.text || isPressedButton(clickButton)}
             isLoader={clickButton.add}
           />
           <Button
@@ -172,7 +159,8 @@ export const StackPage: React.FC = () => {
             extraClass="mr-40"
             onClick={deleteValueButton}
             disabled={
-              !Boolean(arrayText.displayedTextArray.length) || isPressedButton()
+              !Boolean(arrayText.displayedTextArray.length) ||
+              isPressedButton(clickButton)
             }
             isLoader={clickButton.delete}
           />
@@ -183,7 +171,8 @@ export const StackPage: React.FC = () => {
               setArrayText({ displayedTextArray: [] });
             }}
             disabled={
-              !Boolean(arrayText.displayedTextArray.length) || isPressedButton()
+              !Boolean(arrayText.displayedTextArray.length) ||
+              isPressedButton(clickButton)
             }
             isLoader={clickButton.clear}
           />
@@ -192,17 +181,13 @@ export const StackPage: React.FC = () => {
           {arrayText.displayedTextArray.length
             ? arrayText.displayedTextArray.map((item, index) => {
                 const lastIndex = arrayText.displayedTextArray.length - 1;
-                const circleState = item.changing
-                  ? ElementStates.Changing
-                  : item.modified
-                  ? ElementStates.Modified
-                  : ElementStates.Default;
+                const circleState = getCircleStateBasedOn(item);
 
                 return (
                   <Circle
                     key={item.id}
                     state={circleState}
-                    letter={item.letter}
+                    letter={item.value}
                     index={index}
                     head={index === lastIndex ? "top" : ""}
                     extraClass={index === lastIndex ? "" : "mr-8"}

@@ -8,7 +8,7 @@ import { Button } from "../ui/button/button";
 import { useForm } from "../../hooks/useForm";
 import { Circle } from "../ui/circle/circle";
 import { IItemObject } from "../../types/types";
-import { circleStateBasedOn } from "../../utils/utils";
+import { getCircleStateBasedOn } from "../../utils/utils";
 import { delay } from "../../utils/utils";
 
 export const StringComponent: React.FC = () => {
@@ -142,7 +142,7 @@ export const StringComponent: React.FC = () => {
         {clickButton && (
           <div className={styles.result_box}>
             {displayedItems.items.map((letterObj, index, arr) => {
-              const circleState = circleStateBasedOn(letterObj);
+              const circleState = getCircleStateBasedOn(letterObj);
               return (
                 <Circle
                   state={circleState}

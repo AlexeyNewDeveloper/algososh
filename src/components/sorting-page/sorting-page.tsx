@@ -10,6 +10,7 @@ import { swap } from "../../utils/utils";
 import { ElementStates } from "../../types/element-states";
 import { IItemObject } from "../../types/types";
 import { delay } from "../../utils/utils";
+import { getCircleStateBasedOn } from "../../utils/utils";
 
 export const SortingPage: React.FC = () => {
   const [method, setMethod] = React.useState<{
@@ -258,11 +259,7 @@ export const SortingPage: React.FC = () => {
       {clickNewArray && (
         <div className={styles.result_box}>
           {array.map((element, index, arr) => {
-            const columnState = element.changing
-              ? ElementStates.Changing
-              : element.modified
-              ? ElementStates.Modified
-              : ElementStates.Default;
+            const columnState = getCircleStateBasedOn(element);
             return (
               <Column
                 key={element.id}

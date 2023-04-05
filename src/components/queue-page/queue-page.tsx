@@ -7,13 +7,9 @@ import { useForm } from "../../hooks/useForm";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { nanoid } from "nanoid";
-
-interface ILetter {
-  letter: string;
-  id: string;
-  modified: boolean;
-  changing: boolean;
-}
+import { IItemObject } from "../../types/types";
+import { isPressedButton } from "../../utils/utils";
+import { getCircleStateBasedOn } from "../../utils/utils";
 
 interface IQueue<T> {
   enqueue: (item: T) => void;
@@ -93,12 +89,12 @@ export class Queue<T> implements IQueue<T> {
   };
 }
 
-const queue = new Queue<ILetter>(7);
+const queue = new Queue<IItemObject>(7);
 
-const getNewEmptyDisplayedQueue = (length: number): Array<ILetter> => {
+const getNewEmptyDisplayedQueue = (length: number): Array<IItemObject> => {
   return Array.from({ length }, () => {
-    const emptyObject: ILetter = {
-      letter: "",
+    const emptyObject: IItemObject = {
+      value: "",
       id: nanoid(),
       modified: false,
       changing: false,
@@ -117,7 +113,7 @@ export const QueuePage: React.FC = () => {
     clear: false,
   });
   const [arrayText, setArrayText] = React.useState<{
-    displayedTextArray: Array<ILetter>;
+    displayedTextArray: Array<IItemObject>;
   }>({
     displayedTextArray: getNewEmptyDisplayedQueue(queue.getSize()),
   });
@@ -128,7 +124,7 @@ export const QueuePage: React.FC = () => {
   });
 
   const delay = (
-    arr: Array<ILetter>,
+    arr: Array<IItemObject>,
     buttonName: string,
     delay: number = 500
   ) =>
@@ -150,12 +146,12 @@ export const QueuePage: React.FC = () => {
     setValues({ text: null });
     setClickButton({ ...clickButton, add: true });
 
-    let insertedValue: ILetter | null = null;
-    let arrayOfItems: Array<ILetter> = [...arrayText.displayedTextArray];
+    let insertedValue: IItemObject | null = null;
+    let arrayOfItems: Array<IItemObject> = [...arrayText.displayedTextArray];
 
     if (values.text) {
       insertedValue = {
-        letter: values.text,
+        value: values.text,
         id: nanoid(),
         modified: false,
         changing: true,
@@ -180,27 +176,19 @@ export const QueuePage: React.FC = () => {
   async function deleteValueButton() {
     setClickButton({ delete: true });
 
-    let headElementInQueue: ILetter | null = queue.peak();
-    let arr: Array<ILetter> = [...arrayText.displayedTextArray];
+    let headElementInQueue: IItemObject | null = queue.peak();
+    let arr: Array<IItemObject> = [...arrayText.displayedTextArray];
     if (headElementInQueue) {
       headElementInQueue.changing = true;
 
       await delay(arr, "delete");
-      arr[queue.getHeadIndex()].letter = "";
+      arr[queue.getHeadIndex()].value = "";
       arr[queue.getHeadIndex()].changing = false;
       queue.dequeue();
     }
 
     setArrayText({ displayedTextArray: [...arr] });
   }
-
-  const isPressedButton = () => {
-    for (let key in clickButton) {
-      if (clickButton[key] === true) {
-        return true;
-      }
-    }
-  };
 
   return (
     <SolutionLayout title="Очередь">
@@ -220,14 +208,16 @@ export const QueuePage: React.FC = () => {
             text="Добавить"
             extraClass="mr-6"
             onClick={addValueButton}
-            disabled={!values.text || isPressedButton() || queue.isFilled()}
+            disabled={
+              !values.text || isPressedButton(clickButton) || queue.isFilled()
+            }
             isLoader={clickButton.add}
           />
           <Button
             text="Удалить"
             extraClass="mr-40"
             onClick={deleteValueButton}
-            disabled={queue.isEmpty() || isPressedButton()}
+            disabled={queue.isEmpty() || isPressedButton(clickButton)}
             isLoader={clickButton.delete}
           />
           <Button
@@ -239,7 +229,7 @@ export const QueuePage: React.FC = () => {
               queue.clear();
             }}
             disabled={
-              (queue.isEmpty() || isPressedButton()) &&
+              (queue.isEmpty() || isPressedButton(clickButton)) &&
               !(queue.getHeadIndex() === queue.getSize() - 1)
             }
             isLoader={clickButton.clear}
@@ -251,17 +241,13 @@ export const QueuePage: React.FC = () => {
                 const lastIndex = arrayText.displayedTextArray.length - 1;
                 const headIndex = queue.getHeadIndex();
                 const tailIndex = queue.getTailIndex() - 1;
-                const circleState = item.changing
-                  ? ElementStates.Changing
-                  : item.modified
-                  ? ElementStates.Modified
-                  : ElementStates.Default;
+                const circleState = getCircleStateBasedOn(item);
 
                 return (
                   <Circle
                     key={item.id}
                     state={circleState}
-                    letter={item.letter}
+                    letter={item.value}
                     index={index}
                     head={
                       index === headIndex && queue.getTailIndex() ? "head" : ""

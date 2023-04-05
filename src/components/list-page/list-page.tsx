@@ -2,19 +2,15 @@ import React from "react";
 import styles from "./list-page.module.css";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Circle } from "../ui/circle/circle";
-import { ElementStates } from "../../types/element-states";
 import { useForm } from "../../hooks/useForm";
 import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { nanoid } from "nanoid";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
-
-interface ILetter {
-  letter: string;
-  id: string;
-  modified: boolean;
-  changing: boolean;
-}
+import { IItemObject } from "../../types/types";
+import { isPressedButton } from "../../utils/utils";
+import { getCircleStateBasedOn } from "../../utils/utils";
+import { ElementStates } from "../../types/element-states";
 
 export class Node<T> {
   value: T;
@@ -161,16 +157,16 @@ class LinkedList<T> implements ILinkedList<T> {
   }
 }
 
-const initialList = new LinkedList<ILetter>();
+const initialList = new LinkedList<IItemObject>();
 
 const getInitialList = (
   initialArrayOfValues: Array<any>,
-  list: ILinkedList<ILetter>
+  list: ILinkedList<IItemObject>
 ) => {
-  let displayedArray: Array<ILetter> = [];
+  let displayedArray: Array<IItemObject> = [];
   for (let i = 0; i < initialArrayOfValues.length; i++) {
-    let value: ILetter = {
-      letter: initialArrayOfValues[i],
+    let value: IItemObject = {
+      value: initialArrayOfValues[i],
       id: nanoid(),
       changing: false,
       modified: false,
@@ -192,7 +188,7 @@ type TClickButton = {
 };
 
 interface IChangingElement {
-  element: ILetter | null;
+  element: IItemObject | null;
   changeAt: number;
   toAdd: boolean;
   toDelete: boolean;
@@ -212,7 +208,7 @@ export const ListPage: React.FC = () => {
     deleteByIndex: false,
   });
   const [arrayText, setArrayText] = React.useState<{
-    displayedTextArray: Array<ILetter>;
+    displayedTextArray: Array<IItemObject>;
   }>({
     displayedTextArray: displayedArray,
   });
@@ -226,8 +222,8 @@ export const ListPage: React.FC = () => {
   });
 
   const displayChangingValue = (
-    changingValue: ILetter,
-    arr: Array<ILetter>,
+    changingValue: IItemObject,
+    arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
     const isNotHeadOrTail: boolean =
@@ -245,8 +241,8 @@ export const ListPage: React.FC = () => {
   };
 
   const displayFinishChangingValue = (
-    changingValue: ILetter,
-    arr: Array<ILetter>,
+    changingValue: IItemObject,
+    arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
     changingValue.modified = false;
@@ -254,8 +250,8 @@ export const ListPage: React.FC = () => {
   };
 
   const displayFinishDeleteValue = (
-    changingValue: ILetter,
-    arr: Array<ILetter>,
+    changingValue: IItemObject,
+    arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
     const isNotHeadOrTail: boolean =
@@ -272,12 +268,12 @@ export const ListPage: React.FC = () => {
 
   function delay(
     func: (
-      changingValue: ILetter,
-      arr: Array<ILetter>,
+      changingValue: IItemObject,
+      arr: Array<IItemObject>,
       insertedElementIndex: number
     ) => void,
-    arr: Array<ILetter>,
-    changingValue: ILetter,
+    arr: Array<IItemObject>,
+    changingValue: IItemObject,
     changingElementIndex: number,
     delay: number = 500
   ) {
@@ -296,12 +292,12 @@ export const ListPage: React.FC = () => {
     setValues({ textIndex: null, textValue: null });
     setClickButton({ ...clickButton, [buttonName]: true });
 
-    let insertedValue: ILetter | null = null;
-    let arrayOfItems: Array<ILetter> = [...arrayText.displayedTextArray];
+    let insertedValue: IItemObject | null = null;
+    let arrayOfItems: Array<IItemObject> = [...arrayText.displayedTextArray];
 
     if (values.textValue) {
       insertedValue = {
-        letter: values.textValue,
+        value: values.textValue,
         id: nanoid(),
         modified: false,
         changing: true,
@@ -388,7 +384,7 @@ export const ListPage: React.FC = () => {
     setValues({ textIndex: null, textValue: null });
     setClickButton({ ...clickButton, [buttonName]: true });
 
-    let arr: Array<ILetter> = [...arrayText.displayedTextArray];
+    let arr: Array<IItemObject> = [...arrayText.displayedTextArray];
     let positionIndex;
     if (position === "head") {
       positionIndex = 0;
@@ -417,7 +413,7 @@ export const ListPage: React.FC = () => {
         currentChangingElement.toDelete = true;
         currentChangingElement.changeAt = positionIndex;
 
-        arr[positionIndex].letter = "";
+        arr[positionIndex].value = "";
         setChangingElement(currentChangingElement);
         setArrayText({ displayedTextArray: arr });
 
@@ -462,7 +458,7 @@ export const ListPage: React.FC = () => {
       currentChangingElement.toDelete = true;
       currentChangingElement.changeAt = position;
 
-      arr[position].letter = "";
+      arr[position].value = "";
       setChangingElement(currentChangingElement);
       setArrayText({ displayedTextArray: arr });
 
@@ -473,13 +469,6 @@ export const ListPage: React.FC = () => {
     setClickButton({ ...clickButton, [buttonName]: false });
   }
 
-  const isPressedButton = () => {
-    for (let key in clickButton) {
-      if (clickButton[key] === true) {
-        return true;
-      }
-    }
-  };
   return (
     <SolutionLayout title="Связный список">
       <div className={styles.wrap}>
@@ -494,7 +483,7 @@ export const ListPage: React.FC = () => {
             maxLength={4}
             extraClass={`${styles.input} mr-6`}
             value={values.textValue ? values.textValue : ""}
-            disabled={isPressedButton()}
+            disabled={isPressedButton(clickButton)}
           />
           <div className={styles.buttons}>
             <Button
@@ -503,7 +492,7 @@ export const ListPage: React.FC = () => {
               onClick={() => {
                 addValueToList("addToHead", "head");
               }}
-              disabled={isPressedButton() || !values.textValue}
+              disabled={isPressedButton(clickButton) || !values.textValue}
               isLoader={clickButton.addToHead}
               linkedList="small"
             />
@@ -513,7 +502,7 @@ export const ListPage: React.FC = () => {
               onClick={() => {
                 addValueToList("addToTail", "tail");
               }}
-              disabled={isPressedButton() || !values.textValue}
+              disabled={isPressedButton(clickButton) || !values.textValue}
               isLoader={clickButton.addToTail}
               linkedList="small"
             />
@@ -524,7 +513,8 @@ export const ListPage: React.FC = () => {
                 deleteValueFromList("deleteFromHead", "head");
               }}
               disabled={
-                isPressedButton() || !arrayText.displayedTextArray.length
+                isPressedButton(clickButton) ||
+                !arrayText.displayedTextArray.length
               }
               isLoader={clickButton.deleteFromHead}
               linkedList="small"
@@ -535,7 +525,8 @@ export const ListPage: React.FC = () => {
                 deleteValueFromList("deleteFromTail", "tail");
               }}
               disabled={
-                isPressedButton() || !arrayText.displayedTextArray.length
+                isPressedButton(clickButton) ||
+                !arrayText.displayedTextArray.length
               }
               isLoader={clickButton.deleteFromTail}
               extraClass={`${styles.deleteFromTail}`}
@@ -552,7 +543,7 @@ export const ListPage: React.FC = () => {
             }}
             extraClass={`${styles.input} mr-6`}
             value={values.textIndex ? values.textIndex : ""}
-            disabled={isPressedButton()}
+            disabled={isPressedButton(clickButton)}
             type="number"
           />
           <div className={styles.buttons}>
@@ -563,7 +554,7 @@ export const ListPage: React.FC = () => {
                 addValueToList("addByIndex", Number(values.textIndex));
               }}
               disabled={
-                isPressedButton() ||
+                isPressedButton(clickButton) ||
                 !Boolean(values.textValue && values.textIndex)
               }
               isLoader={clickButton.addByIndex}
@@ -576,7 +567,7 @@ export const ListPage: React.FC = () => {
                 deleteValueFromList("deleteByIndex", Number(values.textIndex));
               }}
               disabled={
-                isPressedButton() ||
+                isPressedButton(clickButton) ||
                 !Boolean(
                   values.textIndex && arrayText.displayedTextArray.length
                 )
@@ -597,7 +588,7 @@ export const ListPage: React.FC = () => {
                     !changingElement.toDelete ? (
                       <Circle
                         state={ElementStates.Changing}
-                        letter={changingElement.element?.letter}
+                        letter={changingElement.element?.value}
                         isSmall={true}
                       />
                     ) : (
@@ -614,7 +605,7 @@ export const ListPage: React.FC = () => {
                     changingElement.toDelete ? (
                       <Circle
                         state={ElementStates.Changing}
-                        letter={changingElement.element?.letter}
+                        letter={changingElement.element?.value}
                         isSmall={true}
                       />
                     ) : (
@@ -628,17 +619,13 @@ export const ListPage: React.FC = () => {
                   changingElement && changingElement.changeAt === index ? (
                     <Circle
                       state={ElementStates.Changing}
-                      letter={changingElement.element?.letter}
+                      letter={changingElement.element?.value}
                       isSmall={true}
                     />
                   ) : (
                     ""
                   );
-                const circleState = item.changing
-                  ? ElementStates.Changing
-                  : item.modified
-                  ? ElementStates.Modified
-                  : ElementStates.Default;
+                const circleState = getCircleStateBasedOn(item);
 
                 return (
                   <div
@@ -647,7 +634,7 @@ export const ListPage: React.FC = () => {
                   >
                     <Circle
                       state={circleState}
-                      letter={item.letter}
+                      letter={item.value}
                       index={index}
                       head={
                         index === 0
