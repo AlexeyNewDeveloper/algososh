@@ -7,31 +7,26 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { useForm } from "../../hooks/useForm";
 import { Circle } from "../ui/circle/circle";
-import { ElementStates } from "../../types/element-states";
-
-interface ILetter {
-  letter: string;
-  id: string;
-  modified: boolean;
-  changing: boolean;
-}
+import { IItemObject } from "../../types/types";
+import { circleStateBasedOn } from "../../utils/utils";
+import { delay } from "../../utils/utils";
 
 export const StringComponent: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [arrayText, setArrayText] = React.useState<{
-    displayedTextArray: Array<ILetter>;
+  const [displayedItems, setDisplayedItems] = React.useState<{
+    items: Array<IItemObject>;
   }>({
-    displayedTextArray: [],
+    items: [],
   });
-  const { values, handleChange } = useForm<{
-    text: string;
+  const { values, handleChange, setValues } = useForm<{
+    text: string | null;
   }>({
-    text: "",
+    text: null,
   });
 
-  const swapLetter = (
-    arr: Array<any>,
+  const modifyItems = (
+    arr: Array<IItemObject>,
     firstIndex: number,
     secondIndex: number
   ) => {
@@ -45,69 +40,82 @@ export const StringComponent: React.FC = () => {
     }
     arr[firstIndex].changing = true;
     arr[secondIndex].changing = true;
-    return swap(arr, firstIndex, secondIndex);
+    return arr;
   };
 
-  const delaySwap = (
-    str: Array<any>,
+  const getModifyArray = (
+    arr: Array<IItemObject>,
     start: number,
     end: number,
-    lastIteration: boolean = false,
-    delay: number = 1000
-  ) =>
-    new Promise((res) =>
-      setTimeout(() => {
-        if (lastIteration) {
-          if (str.length % 2) {
-            str[start - 1].modified = true;
-            str[start].modified = true;
-            str[end + 1].modified = true;
-            str[start - 1].changing = false;
-            str[end + 1].changing = false;
-          } else {
-            str[start].modified = true;
-            str[end].modified = true;
-            str[start].changing = false;
-            str[end].changing = false;
-          }
+    lastIteration: boolean = false
+  ) => {
+    if (lastIteration) {
+      if (arr.length % 2) {
+        arr[start - 1].modified = true;
+        arr[start].modified = true;
+        arr[end + 1].modified = true;
+        arr[start - 1].changing = false;
+        arr[end + 1].changing = false;
+      } else {
+        arr[start].modified = true;
+        arr[end].modified = true;
+        arr[start].changing = false;
+        arr[end].changing = false;
+      }
 
-          setArrayText({ ...arrayText, displayedTextArray: str });
-        } else {
-          setArrayText({
-            ...arrayText,
-            displayedTextArray: swapLetter(str, start, end),
-          });
-        }
+      return arr;
+    } else {
+      return modifyItems(arr, start, end);
+    }
+  };
 
-        res(true);
-      }, delay)
-    );
-
-  async function swapString(str: Array<ILetter>) {
+  async function swapString(
+    [...str]: Array<IItemObject>,
+    delayNumber: number = 1000
+  ) {
     let start = 0;
     let end = str.length - 1;
     while (start < end) {
-      await delaySwap(str, start, end);
+      let modifiedArray = getModifyArray(str, start, end);
+      await delay(() => {
+        setDisplayedItems({ items: modifiedArray });
+      }, delayNumber);
+
+      let changedArray = swap(modifiedArray, start, end);
+      await delay(() => {
+        setDisplayedItems({ items: changedArray });
+      }, delayNumber);
+
       start++;
       end--;
       if (start >= end) {
-        await delaySwap(str, start, end, true);
+        modifiedArray = getModifyArray(str, start, end, true);
+        await delay(() => {
+          setDisplayedItems({ items: modifiedArray });
+        }, delayNumber);
       }
     }
     setLoading(false);
   }
 
   const onClickButton = () => {
+    setValues({ text: null });
     setClickButton(true);
     setLoading(true);
-    const arrayOfLetterObject = values.text.split("").map((letter) => {
-      return { letter, id: nanoid(), modified: false, changing: false };
+
+    let arrayOfItemsObject: Array<IItemObject> = [];
+
+    if (values.text) {
+      arrayOfItemsObject = values.text.split("").map((value) => {
+        return { value, id: nanoid(), modified: false, changing: false };
+      });
+    }
+
+    setDisplayedItems({
+      ...displayedItems,
+      items: arrayOfItemsObject,
     });
-    setArrayText({
-      ...arrayText,
-      displayedTextArray: arrayOfLetterObject,
-    });
-    swapString(arrayOfLetterObject);
+    swapString(arrayOfItemsObject);
   };
 
   return (
@@ -122,26 +130,24 @@ export const StringComponent: React.FC = () => {
             isLimitText={true}
             maxLength={11}
             extraClass="mr-12"
+            value={values.text ? values.text : ""}
           />
           <Button
             isLoader={loading}
             onClick={onClickButton}
             text="Развернуть"
+            disabled={!values.text}
           />
         </div>
         {clickButton && (
           <div className={styles.result_box}>
-            {arrayText.displayedTextArray.map((letterObj, index, arr) => {
-              const circleState = letterObj.changing
-                ? ElementStates.Changing
-                : letterObj.modified
-                ? ElementStates.Modified
-                : ElementStates.Default;
+            {displayedItems.items.map((letterObj, index, arr) => {
+              const circleState = circleStateBasedOn(letterObj);
               return (
                 <Circle
                   state={circleState}
                   key={letterObj.id}
-                  letter={letterObj.letter}
+                  letter={letterObj.value}
                   extraClass={index === arr.length - 1 ? "" : "mr-16"}
                 />
               );

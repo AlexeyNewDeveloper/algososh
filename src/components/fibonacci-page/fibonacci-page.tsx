@@ -5,30 +5,21 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { useForm } from "../../hooks/useForm";
 import { Circle } from "../ui/circle/circle";
+import { delay } from "../../utils/utils";
 
 export const FibonacciPage: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [arrayText, setArrayText] = React.useState<{
-    displayedTextArray: Array<number>;
+  const [displayedItems, setDisplayedItems] = React.useState<{
+    items: Array<number>;
   }>({
-    displayedTextArray: [],
+    items: [],
   });
-  const { values, handleChange } = useForm<{
+  const { values, handleChange, setValues } = useForm<{
     number: string | null;
   }>({
     number: null,
   });
-
-  const delayFibIter = (displayedArr: number[], ms: number) =>
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        setArrayText({
-          displayedTextArray: displayedArr,
-        });
-        resolve(true);
-      }, ms);
-    });
 
   async function fibIterative(n: number) {
     let arr: number[] = [1, 1];
@@ -38,17 +29,22 @@ export const FibonacciPage: React.FC = () => {
     }
     for (let i = 0; i < arr.length; i++) {
       displayedArr.push(arr[i]);
-      await delayFibIter(displayedArr, 500);
+      await delay(() => {
+        setDisplayedItems({
+          items: displayedArr,
+        });
+      }, 500);
     }
     setLoading(false);
   }
 
   const onClickButton = () => {
-    setArrayText({
-      displayedTextArray: [],
+    setDisplayedItems({
+      items: [],
     });
     setClickButton(true);
     setLoading(true);
+    setValues({ number: null });
     fibIterative(Number(values.number));
   };
 
@@ -65,6 +61,7 @@ export const FibonacciPage: React.FC = () => {
             isLimitText={true}
             type="number"
             extraClass="mr-12"
+            value={values.number ? values.number : ""}
           />
           <Button
             isLoader={loading}
@@ -79,7 +76,7 @@ export const FibonacciPage: React.FC = () => {
         </div>
         {clickButton && (
           <div className={styles.result_box}>
-            {arrayText.displayedTextArray.map((number, index, arr) => {
+            {displayedItems.items.map((number, index, arr) => {
               return (
                 <Circle key={index} letter={String(number)} index={index} />
               );

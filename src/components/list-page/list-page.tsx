@@ -122,10 +122,6 @@ class LinkedList<T> implements ILinkedList<T> {
 
   deleteElementByIndex(index: number) {
     if (this.head) {
-      // const startElement: T = this.head.value;
-      // let dummyHead = new Node<T>(startElement);
-      // dummyHead.next = this.head;
-      // let curr = dummyHead;
       let curr: Node<T> | null = this.head;
       let i = 0;
       if (i === index && !curr.next) {
@@ -204,13 +200,6 @@ interface IChangingElement {
 
 const { displayedArray, list } = getInitialList([0, 34, 8, 1], initialList);
 
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
 export const ListPage: React.FC = () => {
   const [changingElement, setChangingElement] =
     React.useState<IChangingElement | null>(null);
@@ -290,7 +279,7 @@ export const ListPage: React.FC = () => {
     arr: Array<ILetter>,
     changingValue: ILetter,
     changingElementIndex: number,
-    delay: number = 1000
+    delay: number = 500
   ) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -365,7 +354,7 @@ export const ListPage: React.FC = () => {
                   changeAt: i,
                 });
                 resolve(true);
-              }, 1000);
+              }, 500);
             }))();
 
           if (i > 0) {
@@ -456,7 +445,7 @@ export const ListPage: React.FC = () => {
               setArrayText({ displayedTextArray: [...arr] });
 
               resolve(true);
-            }, 1000);
+            }, 500);
           }))();
       }
 
@@ -564,6 +553,7 @@ export const ListPage: React.FC = () => {
             extraClass={`${styles.input} mr-6`}
             value={values.textIndex ? values.textIndex : ""}
             disabled={isPressedButton()}
+            type="number"
           />
           <div className={styles.buttons}>
             <Button

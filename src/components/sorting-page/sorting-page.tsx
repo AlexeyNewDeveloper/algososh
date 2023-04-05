@@ -8,13 +8,8 @@ import { Direction } from "../../types/direction";
 import { Column } from "../ui/column/column";
 import { swap } from "../../utils/utils";
 import { ElementStates } from "../../types/element-states";
-
-interface IColumn {
-  number: number;
-  id: string;
-  modified: boolean;
-  changing: boolean;
-}
+import { IItemObject } from "../../types/types";
+import { delay } from "../../utils/utils";
 
 export const SortingPage: React.FC = () => {
   const [method, setMethod] = React.useState<{
@@ -24,7 +19,7 @@ export const SortingPage: React.FC = () => {
     choice: true,
     bubble: false,
   });
-  const [array, setArray] = React.useState<IColumn[]>([]);
+  const [array, setArray] = React.useState<IItemObject[]>([]);
   const [clickSortButton, setClickSortButton] = React.useState<
     "desc" | "asc" | boolean
   >(false);
@@ -34,7 +29,7 @@ export const SortingPage: React.FC = () => {
     const lengthArr = Math.floor(Math.random() * (17 - 3 + 1)) + 3;
     return Array.from({ length: lengthArr }, () => {
       return {
-        number: Math.floor(Math.random() * 101),
+        value: String(Math.floor(Math.random() * 101)),
         id: nanoid(),
         modified: false,
         changing: false,
@@ -42,52 +37,45 @@ export const SortingPage: React.FC = () => {
     });
   };
 
-  const delaySwap = (
-    array: Array<IColumn>,
+  const getModifyArray = (
+    array: Array<IItemObject>,
     start: number,
     end: number,
-    typeSort: "selection" | "bubble" = "selection",
-    delay: number = 500
-  ) =>
-    new Promise((res) =>
-      setTimeout(() => {
-        if (typeSort === "bubble") {
-          array[start].changing = true;
-          array[end].changing = true;
-          if (
-            end >= 2 &&
-            start >= 1 &&
-            array[end - 2].changing &&
-            array[start - 1].changing
-          ) {
-            array[end - 2].changing = false;
-            array[start - 1].changing = false;
-          }
-        } else {
-          array[start].changing = true;
-          array[end].changing = true;
-          if (array[end - 1].changing && array[end - 1] !== array[start]) {
-            array[end - 1].changing = false;
-          }
-        }
-
-        setArray([...array]);
-
-        res(true);
-      }, delay)
-    );
+    typeSort: "selection" | "bubble" = "selection"
+  ) => {
+    if (typeSort === "bubble") {
+      array[start].changing = true;
+      array[end].changing = true;
+      if (
+        end >= 2 &&
+        start >= 1 &&
+        array[end - 2].changing &&
+        array[start - 1].changing
+      ) {
+        array[end - 2].changing = false;
+        array[start - 1].changing = false;
+      }
+    } else {
+      array[start].changing = true;
+      array[end].changing = true;
+      if (array[end - 1].changing && array[end - 1] !== array[start]) {
+        array[end - 1].changing = false;
+      }
+    }
+    return array;
+  };
 
   const compareElement = (
-    firstElement: IColumn,
-    secondElement: IColumn,
+    firstElement: IItemObject,
+    secondElement: IItemObject,
     mode: "biggest" | "smallest"
   ) => {
     if (mode === "biggest") {
-      return firstElement.number < secondElement.number
+      return firstElement.value < secondElement.value
         ? secondElement
         : firstElement;
     } else if (mode === "smallest") {
-      return firstElement.number < secondElement.number
+      return firstElement.value < secondElement.value
         ? firstElement
         : secondElement;
     } else {
@@ -95,21 +83,33 @@ export const SortingPage: React.FC = () => {
     }
   };
 
-  async function bubbleSort(array: IColumn[], sorting: string) {
+  async function bubbleSort(
+    array: IItemObject[],
+    sorting: string,
+    delayNumber: number
+  ) {
     const arr = [...array].map((element) => {
       return { ...element, changing: false, modified: false };
     });
 
     for (let i = 0; i < arr.length; i++) {
       for (let j = 0; j < arr.length - i - 1; j++) {
-        if (sorting === "desc" && arr[j].number < arr[j + 1].number) {
-          await delaySwap(arr, j, j + 1, "bubble");
+        if (sorting === "desc" && arr[j].value < arr[j + 1].value) {
+          await delay(() => {
+            getModifyArray(arr, j, j + 1, "bubble");
+          }, delayNumber);
+
           setArray([...swap(arr, j, j + 1)]);
-        } else if (sorting === "asc" && arr[j].number > arr[j + 1].number) {
-          await delaySwap(arr, j, j + 1, "bubble");
+        } else if (sorting === "asc" && arr[j].value > arr[j + 1].value) {
+          await delay(() => {
+            getModifyArray(arr, j, j + 1, "bubble");
+          }, delayNumber);
+
           setArray([...swap(arr, j, j + 1)]);
         } else {
-          await delaySwap(arr, j, j + 1, "bubble");
+          await delay(() => {
+            getModifyArray(arr, j, j + 1, "bubble");
+          }, delayNumber);
         }
       }
       arr[arr.length - i - 1].changing = false;
@@ -123,13 +123,16 @@ export const SortingPage: React.FC = () => {
     setClickSortButton(true);
   }
 
-  async function selectionSort(array: IColumn[], sorting: string) {
+  async function selectionSort(
+    array: IItemObject[],
+    sorting: string,
+    delayNumber: number
+  ) {
     const arr = [...array].map((element) => {
       return { ...element, changing: false, modified: false };
     });
     const { length } = arr;
-    let lastIteration: boolean = false;
-    let exchangedElement: { element: IColumn; index: number } | null = null;
+    let exchangedElement: { element: IItemObject; index: number } | null = null;
     for (let i = 0; i < length; i++) {
       for (let j = i + 1; j < length; j++) {
         if (!exchangedElement) {
@@ -144,20 +147,21 @@ export const SortingPage: React.FC = () => {
           }
         }
 
-        if (lastIteration) {
-          arr[length - 1].changing = false;
-          lastIteration = false;
-        }
-        if (j === arr.length - 1) {
-          lastIteration = true;
-        }
-        await delaySwap(arr, i, j);
+        let modifiedArray = getModifyArray(arr, i, j);
+        await delay(() => {
+          setArray([...modifiedArray]);
+        }, delayNumber);
       }
+
+      arr[length - 1].changing = false;
+      await delay(() => {
+        setArray([...arr]);
+      }, delayNumber);
 
       if (exchangedElement) {
         if (
           sorting === "desc" &&
-          arr[i].number < exchangedElement.element.number
+          arr[i].value < exchangedElement.element.value
         ) {
           arr[i].changing = false;
           arr[exchangedElement.index].changing = false;
@@ -166,7 +170,7 @@ export const SortingPage: React.FC = () => {
         }
         if (
           sorting === "asc" &&
-          arr[i].number > exchangedElement.element.number
+          arr[i].value > exchangedElement.element.value
         ) {
           arr[i].changing = false;
           arr[exchangedElement.index].changing = false;
@@ -222,9 +226,9 @@ export const SortingPage: React.FC = () => {
           onClick={() => {
             setClickSortButton("asc");
             if (method.choice) {
-              selectionSort(array, "asc");
+              selectionSort(array, "asc", 500);
             } else if (method.bubble) {
-              bubbleSort(array, "asc");
+              bubbleSort(array, "asc", 500);
             }
           }}
           isLoader={clickSortButton === "asc"}
@@ -237,9 +241,9 @@ export const SortingPage: React.FC = () => {
           onClick={() => {
             setClickSortButton("desc");
             if (method.choice) {
-              selectionSort(array, "desc");
+              selectionSort(array, "desc", 500);
             } else if (method.bubble) {
-              bubbleSort(array, "desc");
+              bubbleSort(array, "desc", 500);
             }
           }}
           isLoader={clickSortButton === "desc"}
@@ -263,7 +267,7 @@ export const SortingPage: React.FC = () => {
               <Column
                 key={element.id}
                 state={columnState}
-                index={element.number}
+                index={Number(element.value)}
                 extraClass={index === arr.length - 1 ? "" : "mr-10"}
               />
             );
