@@ -231,7 +231,7 @@ export const ListPage: React.FC = () => {
     changingElementIndex: number
   ) => {
     const isNotHeadOrTail: boolean =
-      changingElementIndex !== 0 && changingElementIndex !== arr.length - 1;
+      changingElementIndex !== 0 && changingElementIndex !== arr.length;
     if (isNotHeadOrTail) {
       for (let i = 0; i <= changingElementIndex; i++) {
         arr[i].changing = false;
