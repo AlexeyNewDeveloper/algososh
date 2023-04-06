@@ -47,13 +47,7 @@ export const SortingPage: React.FC = () => {
     if (typeSort === "bubble") {
       array[start].changing = true;
       array[end].changing = true;
-      if (
-        end >= 2 &&
-        start >= 1 &&
-        array[end - 2].changing &&
-        array[start - 1].changing
-      ) {
-        array[end - 2].changing = false;
+      if (start >= 1 && array[start - 1].changing) {
         array[start - 1].changing = false;
       }
     } else {
@@ -89,35 +83,28 @@ export const SortingPage: React.FC = () => {
     sorting: string,
     delayNumber: number
   ) {
-    const arr = [...array].map((element) => {
+    let arr = [...array].map((element) => {
       return { ...element, changing: false, modified: false };
     });
 
     for (let i = 0; i < arr.length; i++) {
       for (let j = 0; j < arr.length - i - 1; j++) {
-        if (
-          sorting === "desc" &&
-          Number(arr[j].value) < Number(arr[j + 1].value)
-        ) {
-          await delay(() => {
-            getModifyArray(arr, j, j + 1, "bubble");
-          }, delayNumber);
-
-          setArray([...swap(arr, j, j + 1)]);
-        } else if (
-          sorting === "asc" &&
-          Number(arr[j].value) > Number(arr[j + 1].value)
-        ) {
-          await delay(() => {
-            getModifyArray(arr, j, j + 1, "bubble");
-          }, delayNumber);
-
-          setArray([...swap(arr, j, j + 1)]);
-        } else {
-          await delay(() => {
-            getModifyArray(arr, j, j + 1, "bubble");
-          }, delayNumber);
-        }
+        await delay(() => {
+          let modifiedArray = getModifyArray(arr, j, j + 1, "bubble");
+          if (
+            sorting === "desc" &&
+            Number(arr[j].value) < Number(arr[j + 1].value)
+          ) {
+            swap(modifiedArray, j, j + 1);
+          }
+          if (
+            sorting === "asc" &&
+            Number(arr[j].value) > Number(arr[j + 1].value)
+          ) {
+            swap(modifiedArray, j, j + 1);
+          }
+          setArray([...modifiedArray]);
+        }, delayNumber);
       }
       arr[arr.length - i - 1].changing = false;
       if (arr.length - i >= 2) {
@@ -140,9 +127,11 @@ export const SortingPage: React.FC = () => {
     });
     const { length } = arr;
     let exchangedElement: { element: IItemObject; index: number } | null = null;
+
     for (let i = 0; i < length; i++) {
       for (let j = i + 1; j < length; j++) {
         let modifiedArray = getModifyArray(arr, i, j);
+
         await delay(() => {
           setArray([...modifiedArray]);
         }, delayNumber);
