@@ -10,6 +10,8 @@ import { IItemObject } from "../../types/types";
 import { isPressedButton } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { Queue } from "./queue";
+import { delay } from "../../utils/utils";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 const queue = new Queue<IItemObject>(7);
 
@@ -45,24 +47,24 @@ export const QueuePage: React.FC = () => {
     text: null,
   });
 
-  const delay = (
-    arr: Array<IItemObject>,
-    buttonName: string,
-    delay: number = 500
-  ) =>
-    new Promise((res) =>
-      setTimeout(() => {
-        let lastElement = arr[queue.getTailIndex() - 1];
-        if (buttonName === "add") {
-          lastElement.changing = !lastElement.changing;
-        }
+  // const delay = (
+  //   arr: Array<IItemObject>,
+  //   buttonName: string,
+  //   delay: number = 500
+  // ) =>
+  //   new Promise((res) =>
+  //     setTimeout(() => {
+  //       let lastElement = arr[queue.getTailIndex() - 1];
+  //       if (buttonName === "add") {
+  //         lastElement.changing = !lastElement.changing;
+  //       }
 
-        setArrayText({ displayedTextArray: arr });
-        setClickButton({ ...clickButton, [buttonName]: false });
+  //       setArrayText({ displayedTextArray: arr });
+  //       setClickButton({ ...clickButton, [buttonName]: false });
 
-        res(true);
-      }, delay)
-    );
+  //       res(true);
+  //     }, delay)
+  //   );
 
   async function addValueButton() {
     setValues({ text: null });
@@ -90,7 +92,14 @@ export const QueuePage: React.FC = () => {
           displayedTextArray: arrayOfItems,
         });
 
-        await delay(arrayOfItems, "add");
+        await delay(() => {
+          let lastElement = arrayOfItems[queue.getTailIndex() - 1];
+          lastElement.changing = !lastElement.changing;
+
+          setArrayText({ displayedTextArray: arrayOfItems });
+        }, SHORT_DELAY_IN_MS);
+
+        setClickButton({ ...clickButton, add: false });
       }
     }
   }
@@ -102,14 +111,17 @@ export const QueuePage: React.FC = () => {
     let arr: Array<IItemObject> = [...arrayText.displayedTextArray];
     if (headElementInQueue) {
       headElementInQueue.changing = true;
+      await delay(() => {
+        setArrayText({ displayedTextArray: arr });
+      }, SHORT_DELAY_IN_MS);
 
-      await delay(arr, "delete");
       arr[queue.getHeadIndex()].value = "";
       arr[queue.getHeadIndex()].changing = false;
       queue.dequeue();
     }
 
     setArrayText({ displayedTextArray: [...arr] });
+    setClickButton({ delete: false });
   }
 
   return (
