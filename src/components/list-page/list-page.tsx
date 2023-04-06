@@ -93,12 +93,8 @@ export const ListPage: React.FC = () => {
     arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
-    const isNotHeadOrTail: boolean =
-      changingElementIndex !== 0 && changingElementIndex !== arr.length - 1;
-    if (isNotHeadOrTail) {
-      for (let i = 0; i <= changingElementIndex; i++) {
-        arr[i].changing = false;
-      }
+    for (let i = 0; i <= changingElementIndex; i++) {
+      arr[i].changing = false;
     }
     arr.splice(changingElementIndex, 1);
     setArrayText({ displayedTextArray: arr });
