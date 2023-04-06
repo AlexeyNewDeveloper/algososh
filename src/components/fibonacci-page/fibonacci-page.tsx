@@ -52,9 +52,7 @@ export const FibonacciPage: React.FC = () => {
         <div className={styles.content}>
           <Input
             name="number"
-            onChange={(e) => {
-              handleChange(e);
-            }}
+            onChange={handleChange}
             max={19}
             isLimitText={true}
             type="number"

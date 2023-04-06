@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import { ElementStates } from "../types/element-states";
 import { IItemObject } from "../types/types";
 
