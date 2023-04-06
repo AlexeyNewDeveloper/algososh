@@ -161,16 +161,12 @@ export const ListPage: React.FC = () => {
         list.addByIndex(insertedValue, position);
 
         for (let i = 0; i <= position; i++) {
-          await (() =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                setChangingElement({
-                  ...currentChangingElement,
-                  changeAt: i,
-                });
-                resolve(true);
-              }, 500);
-            }))();
+          await delay(() => {
+            setChangingElement({
+              ...currentChangingElement,
+              changeAt: i,
+            });
+          }, SHORT_DELAY_IN_MS);
 
           if (i > 0) {
             arrayOfItems[i - 1].changing = true;

@@ -10,6 +10,7 @@ import { Circle } from "../ui/circle/circle";
 import { IItemObject } from "../../types/types";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { delay } from "../../utils/utils";
+import { DELAY_IN_MS } from "../../constants/delays";
 
 export const StringComponent: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<boolean>(false);
@@ -71,7 +72,7 @@ export const StringComponent: React.FC = () => {
 
   async function swapString(
     [...str]: Array<IItemObject>,
-    delayNumber: number = 1000
+    delayNumber: number = DELAY_IN_MS
   ) {
     let start = 0;
     let end = str.length - 1;
