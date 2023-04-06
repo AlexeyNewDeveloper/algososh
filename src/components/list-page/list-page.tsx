@@ -52,9 +52,9 @@ export const ListPage: React.FC = () => {
     // displayedTextArray: displayedArray,
   });
   const { values, handleChange, setValues } = useForm<{
-    [name: string]: string | null;
+    [name: string]: string | number | null;
     textValue: string | null;
-    textIndex: string | null;
+    textIndex: number | null;
   }>({
     textValue: null,
     textIndex: null,
@@ -303,7 +303,6 @@ export const ListPage: React.FC = () => {
     setArrayText({ displayedTextArray: [...arr] });
     setClickButton({ ...clickButton, [buttonName]: false });
   }
-
   return (
     <SolutionLayout title="Связный список">
       <div className={styles.wrap}>
@@ -375,11 +374,18 @@ export const ListPage: React.FC = () => {
             name="textIndex"
             onChange={(e) => {
               handleChange(e);
+              if (Number(e.currentTarget.value) > list.getSize() - 1) {
+                setValues({ ...values, textIndex: list.getSize() - 1 });
+              }
+              if (Number(e.currentTarget.value) < 0) {
+                setValues({ ...values, textIndex: 0 });
+              }
             }}
             extraClass={`${styles.input} mr-6`}
             value={values.textIndex ? values.textIndex : ""}
             disabled={isPressedButton(clickButton)}
             type="number"
+            max={list.getSize() - 1}
           />
           <div className={styles.buttons}>
             <Button
