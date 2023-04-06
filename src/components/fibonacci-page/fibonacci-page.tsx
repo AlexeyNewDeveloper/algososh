@@ -7,6 +7,8 @@ import { useForm } from "../../hooks/useForm";
 import { Circle } from "../ui/circle/circle";
 import { delay } from "../../utils/utils";
 import { getFibonacciNumbers } from "./utils";
+import { MAX_NUMBER } from "./utils";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 export const FibonacciPage: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<boolean>(false);
@@ -31,7 +33,7 @@ export const FibonacciPage: React.FC = () => {
         setDisplayedItems({
           items: displayedArr,
         });
-      }, 500);
+      }, SHORT_DELAY_IN_MS);
     }
     setLoading(false);
   }
@@ -53,7 +55,7 @@ export const FibonacciPage: React.FC = () => {
           <Input
             name="number"
             onChange={handleChange}
-            max={19}
+            max={MAX_NUMBER}
             isLimitText={true}
             type="number"
             extraClass="mr-12"
@@ -64,7 +66,7 @@ export const FibonacciPage: React.FC = () => {
             disabled={
               !values.number ||
               !Number(values.number) ||
-              Number(values.number) > 19
+              Number(values.number) > MAX_NUMBER
             }
             onClick={onClickButton}
             text="Рассчитать"
