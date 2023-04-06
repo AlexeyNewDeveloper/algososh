@@ -1,4 +1,4 @@
-const MAX_LENGTH: number = 4;
+export const MAX_LENGTH: number = 4;
 
 interface IQueue<T> {
   enqueue: (item: T) => void;

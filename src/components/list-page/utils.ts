@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { IItemObject } from "../../types/types";
 
+export const MAX_LENGTH: number = 4;
+
 export class Node<T> {
   value: T;
   next: Node<T> | null;
