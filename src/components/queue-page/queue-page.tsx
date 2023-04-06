@@ -48,25 +48,6 @@ export const QueuePage: React.FC = () => {
     text: null,
   });
 
-  // const delay = (
-  //   arr: Array<IItemObject>,
-  //   buttonName: string,
-  //   delay: number = 500
-  // ) =>
-  //   new Promise((res) =>
-  //     setTimeout(() => {
-  //       let lastElement = arr[queue.getTailIndex() - 1];
-  //       if (buttonName === "add") {
-  //         lastElement.changing = !lastElement.changing;
-  //       }
-
-  //       setArrayText({ displayedTextArray: arr });
-  //       setClickButton({ ...clickButton, [buttonName]: false });
-
-  //       res(true);
-  //     }, delay)
-  //   );
-
   async function addValueButton() {
     setValues({ text: null });
     setClickButton({ ...clickButton, add: true });
