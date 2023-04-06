@@ -10,6 +10,7 @@ import { swap } from "../../utils/utils";
 import { IItemObject } from "../../types/types";
 import { delay } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 export const SortingPage: React.FC = () => {
   const [method, setMethod] = React.useState<{
@@ -232,9 +233,9 @@ export const SortingPage: React.FC = () => {
           onClick={() => {
             setClickSortButton("asc");
             if (method.choice) {
-              selectionSort(array, "asc", 500);
+              selectionSort(array, "asc", SHORT_DELAY_IN_MS);
             } else if (method.bubble) {
-              bubbleSort(array, "asc", 500);
+              bubbleSort(array, "asc", SHORT_DELAY_IN_MS);
             }
           }}
           isLoader={clickSortButton === "asc"}
@@ -247,9 +248,9 @@ export const SortingPage: React.FC = () => {
           onClick={() => {
             setClickSortButton("desc");
             if (method.choice) {
-              selectionSort(array, "desc", 500);
+              selectionSort(array, "desc", SHORT_DELAY_IN_MS);
             } else if (method.bubble) {
-              bubbleSort(array, "desc", 500);
+              bubbleSort(array, "desc", SHORT_DELAY_IN_MS);
             }
           }}
           isLoader={clickSortButton === "desc"}
