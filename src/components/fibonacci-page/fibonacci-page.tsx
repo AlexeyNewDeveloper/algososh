@@ -6,6 +6,7 @@ import { Button } from "../ui/button/button";
 import { useForm } from "../../hooks/useForm";
 import { Circle } from "../ui/circle/circle";
 import { delay } from "../../utils/utils";
+import { getFibonacciNumbers } from "./utils";
 
 export const FibonacciPage: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<boolean>(false);
@@ -20,14 +21,6 @@ export const FibonacciPage: React.FC = () => {
   }>({
     number: null,
   });
-
-  function getFibonacciNumbers(n: number) {
-    let arr: number[] = [1, 1];
-    for (let i = 2; i < n + 1; i++) {
-      arr.push(arr[i - 2] + arr[i - 1]);
-    }
-    return arr;
-  }
 
   async function showItems(n: number) {
     let arr = getFibonacciNumbers(n);
