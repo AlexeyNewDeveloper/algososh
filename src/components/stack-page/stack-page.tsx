@@ -10,6 +10,8 @@ import { IItemObject } from "../../types/types";
 import { isPressedButton } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { Stack } from "./stack";
+import { delay } from "../../utils/utils";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 const stack = new Stack<IItemObject>();
 
@@ -32,22 +34,22 @@ export const StackPage: React.FC = () => {
     text: null,
   });
 
-  const delay = (
-    arr: Array<IItemObject>,
-    buttonName: string,
-    delay: number = 500
-  ) =>
-    new Promise((res) =>
-      setTimeout(() => {
-        let lastElement = arr[arr.length - 1];
-        lastElement.changing = !lastElement.changing;
+  // const delay = (
+  //   arr: Array<IItemObject>,
+  //   buttonName: string,
+  //   delay: number = 500
+  // ) =>
+  //   new Promise((res) =>
+  //     setTimeout(() => {
+  //       let lastElement = arr[arr.length - 1];
+  //       lastElement.changing = !lastElement.changing;
 
-        setArrayText({ displayedTextArray: arr });
-        setClickButton({ ...clickButton, [buttonName]: false });
+  //       setArrayText({ displayedTextArray: arr });
+  //       setClickButton({ ...clickButton, [buttonName]: false });
 
-        res(true);
-      }, delay)
-    );
+  //       res(true);
+  //     }, delay)
+  //   );
 
   async function addValueButton() {
     setValues({ text: null });
@@ -80,7 +82,13 @@ export const StackPage: React.FC = () => {
           ),
         });
 
-        await delay(arrayOfItems, "add");
+        await delay(() => {
+          let lastElement = arrayOfItems[arrayOfItems.length - 1];
+          lastElement.changing = !lastElement.changing;
+
+          setArrayText({ displayedTextArray: arrayOfItems });
+        }, SHORT_DELAY_IN_MS);
+        setClickButton({ ...clickButton, add: false });
       }
     }
   }
@@ -94,7 +102,14 @@ export const StackPage: React.FC = () => {
       lastElementInStack.changing = true;
       arr[arr.length - 1] = lastElementInStack;
 
-      await delay(arr, "delete");
+      await delay(() => {
+        let lastElement = arr[arr.length - 1];
+        lastElement.changing = !lastElement.changing;
+
+        setArrayText({ displayedTextArray: arr });
+      }, SHORT_DELAY_IN_MS);
+      setClickButton({ ...clickButton, delete: false });
+
       stack.pop();
       arr.pop();
     }
