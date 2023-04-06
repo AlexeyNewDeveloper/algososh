@@ -11,9 +11,10 @@ import { IItemObject } from "../../types/types";
 import { isPressedButton, randomArr } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { ElementStates } from "../../types/element-states";
-import { LinkedList } from "./linkedList";
+import { LinkedList } from "./utils";
 import { delay } from "../../utils/utils";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { MAX_LENGTH } from "./utils";
 
 const list = new LinkedList<IItemObject>(randomArr(3, 6, 9999));
 
@@ -64,7 +65,7 @@ export const ListPage: React.FC = () => {
     arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
-    const isNotHeadOrTail: boolean =
+    const isNotHeadOrTail =
       changingElementIndex !== 0 && changingElementIndex !== arr.length;
     if (isNotHeadOrTail) {
       for (let i = 0; i <= changingElementIndex; i++) {
@@ -279,7 +280,7 @@ export const ListPage: React.FC = () => {
               handleChange(e);
             }}
             isLimitText={true}
-            maxLength={4}
+            maxLength={MAX_LENGTH}
             extraClass={`${styles.input} mr-6`}
             value={values.textValue ? values.textValue : ""}
             disabled={isPressedButton(clickButton)}
@@ -433,6 +434,21 @@ export const ListPage: React.FC = () => {
                   );
                 const circleState = getCircleStateBasedOn(item);
 
+                const head =
+                  index === 0
+                    ? headElement
+                    : changingElement?.toAdd &&
+                      (clickButton.addByIndex || clickButton.addToTail)
+                    ? anotherIndexElement
+                    : "";
+
+                const tail =
+                  index === lastIndex
+                    ? tailElement
+                    : changingElement?.toDelete
+                    ? anotherIndexElement
+                    : "";
+
                 return (
                   <div
                     key={item.id}
@@ -442,21 +458,8 @@ export const ListPage: React.FC = () => {
                       state={circleState}
                       letter={item.value}
                       index={index}
-                      head={
-                        index === 0
-                          ? headElement
-                          : changingElement?.toAdd &&
-                            (clickButton.addByIndex || clickButton.addToTail)
-                          ? anotherIndexElement
-                          : ""
-                      }
-                      tail={
-                        index === lastIndex
-                          ? tailElement
-                          : changingElement?.toDelete
-                          ? anotherIndexElement
-                          : ""
-                      }
+                      head={head}
+                      tail={tail}
                       extraClass={
                         index === lastIndex
                           ? "ml-8"
