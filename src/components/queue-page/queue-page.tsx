@@ -9,9 +9,10 @@ import { nanoid } from "nanoid";
 import { IItemObject } from "../../types/types";
 import { isPressedButton } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
-import { Queue } from "./queue";
+import { Queue } from "./utils";
 import { delay } from "../../utils/utils";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { MAX_LENGTH } from "./utils";
 
 const queue = new Queue<IItemObject>(7);
 
@@ -134,7 +135,7 @@ export const QueuePage: React.FC = () => {
               handleChange(e);
             }}
             isLimitText={true}
-            maxLength={4}
+            maxLength={MAX_LENGTH}
             extraClass="mr-6"
             value={values.text ? values.text : ""}
           />

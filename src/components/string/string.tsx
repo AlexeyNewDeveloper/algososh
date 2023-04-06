@@ -11,6 +11,7 @@ import { IItemObject } from "../../types/types";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { delay } from "../../utils/utils";
 import { DELAY_IN_MS } from "../../constants/delays";
+import { MAX_LENGTH } from "./utils";
 
 export const StringComponent: React.FC = () => {
   const [clickButton, setClickButton] = React.useState<boolean>(false);
@@ -129,7 +130,7 @@ export const StringComponent: React.FC = () => {
               handleChange(e);
             }}
             isLimitText={true}
-            maxLength={11}
+            maxLength={MAX_LENGTH}
             extraClass="mr-12"
             value={values.text ? values.text : ""}
           />

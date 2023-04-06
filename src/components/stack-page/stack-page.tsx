@@ -9,9 +9,10 @@ import { useForm } from "../../hooks/useForm";
 import { IItemObject } from "../../types/types";
 import { isPressedButton } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
-import { Stack } from "./stack";
+import { Stack } from "./utils";
 import { delay } from "../../utils/utils";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { MAX_LENGTH } from "./utils";
 
 const stack = new Stack<IItemObject>();
 
@@ -33,23 +34,6 @@ export const StackPage: React.FC = () => {
   }>({
     text: null,
   });
-
-  // const delay = (
-  //   arr: Array<IItemObject>,
-  //   buttonName: string,
-  //   delay: number = 500
-  // ) =>
-  //   new Promise((res) =>
-  //     setTimeout(() => {
-  //       let lastElement = arr[arr.length - 1];
-  //       lastElement.changing = !lastElement.changing;
-
-  //       setArrayText({ displayedTextArray: arr });
-  //       setClickButton({ ...clickButton, [buttonName]: false });
-
-  //       res(true);
-  //     }, delay)
-  //   );
 
   async function addValueButton() {
     setValues({ text: null });
@@ -127,7 +111,7 @@ export const StackPage: React.FC = () => {
               handleChange(e);
             }}
             isLimitText={true}
-            maxLength={4}
+            maxLength={MAX_LENGTH}
             extraClass="mr-6"
             value={values.text ? values.text : ""}
           />
