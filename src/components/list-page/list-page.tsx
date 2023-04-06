@@ -11,7 +11,10 @@ import { IItemObject } from "../../types/types";
 import { isPressedButton, randomArr } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { ElementStates } from "../../types/element-states";
-import { LinkedList } from "./linkedList";
+import { LinkedList } from "./utils";
+import { delay } from "../../utils/utils";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { MAX_LENGTH } from "./utils";
 
 const list = new LinkedList<IItemObject>(randomArr(3, 6, 9999));
 
@@ -32,8 +35,6 @@ interface IChangingElement {
   toDelete: boolean;
 }
 
-// const { displayedArray, list } = getInitialList([0, 34, 8, 1], initialList);
-
 export const ListPage: React.FC = () => {
   const [changingElement, setChangingElement] =
     React.useState<IChangingElement | null>(null);
@@ -49,12 +50,11 @@ export const ListPage: React.FC = () => {
     displayedTextArray: Array<IItemObject>;
   }>({
     displayedTextArray: list.toArray(),
-    // displayedTextArray: displayedArray,
   });
   const { values, handleChange, setValues } = useForm<{
-    [name: string]: string | null;
+    [name: string]: string | number | null;
     textValue: string | null;
-    textIndex: string | null;
+    textIndex: number | null;
   }>({
     textValue: null,
     textIndex: null,
@@ -65,7 +65,7 @@ export const ListPage: React.FC = () => {
     arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
-    const isNotHeadOrTail: boolean =
+    const isNotHeadOrTail =
       changingElementIndex !== 0 && changingElementIndex !== arr.length;
     if (isNotHeadOrTail) {
       for (let i = 0; i <= changingElementIndex; i++) {
@@ -81,48 +81,23 @@ export const ListPage: React.FC = () => {
 
   const displayFinishChangingValue = (
     changingValue: IItemObject,
-    arr: Array<IItemObject>,
-    changingElementIndex: number
+    arr: Array<IItemObject>
   ) => {
     changingValue.modified = false;
     setArrayText({ displayedTextArray: arr });
   };
 
   const displayFinishDeleteValue = (
-    changingValue: IItemObject,
     arr: Array<IItemObject>,
     changingElementIndex: number
   ) => {
-    const isNotHeadOrTail: boolean =
-      changingElementIndex !== 0 && changingElementIndex !== arr.length - 1;
-    if (isNotHeadOrTail) {
-      for (let i = 0; i <= changingElementIndex; i++) {
-        arr[i].changing = false;
-      }
+    for (let i = 0; i <= changingElementIndex; i++) {
+      arr[i].changing = false;
     }
     arr.splice(changingElementIndex, 1);
     setArrayText({ displayedTextArray: arr });
     setChangingElement(null);
   };
-
-  function delay(
-    func: (
-      changingValue: IItemObject,
-      arr: Array<IItemObject>,
-      insertedElementIndex: number
-    ) => void,
-    arr: Array<IItemObject>,
-    changingValue: IItemObject,
-    changingElementIndex: number,
-    delay: number = 500
-  ) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        func(changingValue, arr, changingElementIndex);
-        resolve(true);
-      }, delay);
-    });
-  }
 
   async function addValueToList(
     buttonName: keyof TClickButton,
@@ -154,8 +129,16 @@ export const ListPage: React.FC = () => {
       if (position === "head") {
         list.addByIndex(insertedValue, 0);
         setChangingElement(currentChangingElement);
-        await delay(displayChangingValue, arrayOfItems, insertedValue, 0);
-        await delay(displayFinishChangingValue, arrayOfItems, insertedValue, 0);
+        await delay(() => {
+          if (insertedValue) {
+            displayChangingValue(insertedValue, arrayOfItems, 0);
+          }
+        }, SHORT_DELAY_IN_MS);
+        await delay(() => {
+          if (insertedValue) {
+            displayFinishChangingValue(insertedValue, arrayOfItems);
+          }
+        }, SHORT_DELAY_IN_MS);
       }
       if (position === "tail") {
         const lastIndex = arrayOfItems.length - 1;
@@ -164,33 +147,27 @@ export const ListPage: React.FC = () => {
           ...currentChangingElement,
           changeAt: lastIndex,
         });
-        await delay(
-          displayChangingValue,
-          arrayOfItems,
-          insertedValue,
-          lastIndex + 1
-        );
-        await delay(
-          displayFinishChangingValue,
-          arrayOfItems,
-          insertedValue,
-          lastIndex
-        );
+        await delay(() => {
+          if (insertedValue) {
+            displayChangingValue(insertedValue, arrayOfItems, lastIndex + 1);
+          }
+        }, SHORT_DELAY_IN_MS);
+        await delay(() => {
+          if (insertedValue) {
+            displayFinishChangingValue(insertedValue, arrayOfItems);
+          }
+        }, SHORT_DELAY_IN_MS);
       }
       if (typeof position === "number") {
         list.addByIndex(insertedValue, position);
 
         for (let i = 0; i <= position; i++) {
-          await (() =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                setChangingElement({
-                  ...currentChangingElement,
-                  changeAt: i,
-                });
-                resolve(true);
-              }, 500);
-            }))();
+          await delay(() => {
+            setChangingElement({
+              ...currentChangingElement,
+              changeAt: i,
+            });
+          }, SHORT_DELAY_IN_MS);
 
           if (i > 0) {
             arrayOfItems[i - 1].changing = true;
@@ -198,18 +175,16 @@ export const ListPage: React.FC = () => {
 
           setArrayText({ displayedTextArray: [...arrayOfItems] });
         }
-        await delay(
-          displayChangingValue,
-          arrayOfItems,
-          insertedValue,
-          position
-        );
-        await delay(
-          displayFinishChangingValue,
-          arrayOfItems,
-          insertedValue,
-          position
-        );
+        await delay(() => {
+          if (insertedValue) {
+            displayChangingValue(insertedValue, arrayOfItems, position);
+          }
+        }, SHORT_DELAY_IN_MS);
+        await delay(() => {
+          if (insertedValue) {
+            displayFinishChangingValue(insertedValue, arrayOfItems);
+          }
+        }, SHORT_DELAY_IN_MS);
       }
     }
 
@@ -224,7 +199,7 @@ export const ListPage: React.FC = () => {
     setClickButton({ ...clickButton, [buttonName]: true });
 
     let arr: Array<IItemObject> = [...arrayText.displayedTextArray];
-    let positionIndex;
+    let positionIndex: number = 0;
     if (position === "head") {
       positionIndex = 0;
     } else if (position === "tail") {
@@ -238,10 +213,7 @@ export const ListPage: React.FC = () => {
       toDelete: false,
     };
 
-    if (
-      typeof positionIndex === "number" &&
-      (position === "head" || position === "tail")
-    ) {
+    if (position === "head" || position === "tail") {
       list.deleteByIndex(positionIndex);
       const deletedElement = Object.assign(
         {},
@@ -256,12 +228,9 @@ export const ListPage: React.FC = () => {
         setChangingElement(currentChangingElement);
         setArrayText({ displayedTextArray: arr });
 
-        await delay(
-          displayFinishDeleteValue,
-          arr,
-          deletedElement,
-          positionIndex
-        );
+        await delay(() => {
+          displayFinishDeleteValue(arr, positionIndex);
+        }, SHORT_DELAY_IN_MS);
 
         setChangingElement(null);
       }
@@ -273,25 +242,16 @@ export const ListPage: React.FC = () => {
       );
 
       for (let i = 0; i <= position; i++) {
-        await (() =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              arr[i].changing = true;
-              setArrayText({ displayedTextArray: [...arr] });
-
-              resolve(true);
-            }, 500);
-          }))();
+        await delay(() => {
+          arr[i].changing = true;
+          setArrayText({ displayedTextArray: [...arr] });
+        }, SHORT_DELAY_IN_MS);
       }
 
-      await (() =>
-        new Promise((resolve, reject) => {
-          setTimeout(() => {
-            arr[position].changing = false;
-            setArrayText({ displayedTextArray: [...arr] });
-            resolve(true);
-          }, 1000);
-        }))();
+      await delay(() => {
+        arr[position].changing = false;
+        setArrayText({ displayedTextArray: [...arr] });
+      }, SHORT_DELAY_IN_MS);
 
       currentChangingElement.element = deletedElement;
       currentChangingElement.toDelete = true;
@@ -301,13 +261,14 @@ export const ListPage: React.FC = () => {
       setChangingElement(currentChangingElement);
       setArrayText({ displayedTextArray: arr });
 
-      await delay(displayFinishDeleteValue, arr, deletedElement, position);
+      await delay(() => {
+        displayFinishDeleteValue(arr, position);
+      }, SHORT_DELAY_IN_MS);
     }
 
     setArrayText({ displayedTextArray: [...arr] });
     setClickButton({ ...clickButton, [buttonName]: false });
   }
-
   return (
     <SolutionLayout title="Связный список">
       <div className={styles.wrap}>
@@ -319,7 +280,7 @@ export const ListPage: React.FC = () => {
               handleChange(e);
             }}
             isLimitText={true}
-            maxLength={4}
+            maxLength={MAX_LENGTH}
             extraClass={`${styles.input} mr-6`}
             value={values.textValue ? values.textValue : ""}
             disabled={isPressedButton(clickButton)}
@@ -379,11 +340,18 @@ export const ListPage: React.FC = () => {
             name="textIndex"
             onChange={(e) => {
               handleChange(e);
+              if (Number(e.currentTarget.value) > list.getSize() - 1) {
+                setValues({ ...values, textIndex: list.getSize() - 1 });
+              }
+              if (Number(e.currentTarget.value) < 0) {
+                setValues({ ...values, textIndex: 0 });
+              }
             }}
             extraClass={`${styles.input} mr-6`}
             value={values.textIndex ? values.textIndex : ""}
             disabled={isPressedButton(clickButton)}
             type="number"
+            max={list.getSize() - 1}
           />
           <div className={styles.buttons}>
             <Button
@@ -466,6 +434,21 @@ export const ListPage: React.FC = () => {
                   );
                 const circleState = getCircleStateBasedOn(item);
 
+                const head =
+                  index === 0
+                    ? headElement
+                    : changingElement?.toAdd &&
+                      (clickButton.addByIndex || clickButton.addToTail)
+                    ? anotherIndexElement
+                    : "";
+
+                const tail =
+                  index === lastIndex
+                    ? tailElement
+                    : changingElement?.toDelete
+                    ? anotherIndexElement
+                    : "";
+
                 return (
                   <div
                     key={item.id}
@@ -475,21 +458,8 @@ export const ListPage: React.FC = () => {
                       state={circleState}
                       letter={item.value}
                       index={index}
-                      head={
-                        index === 0
-                          ? headElement
-                          : changingElement?.toAdd &&
-                            (clickButton.addByIndex || clickButton.addToTail)
-                          ? anotherIndexElement
-                          : ""
-                      }
-                      tail={
-                        index === lastIndex
-                          ? tailElement
-                          : changingElement?.toDelete
-                          ? anotherIndexElement
-                          : ""
-                      }
+                      head={head}
+                      tail={tail}
                       extraClass={
                         index === lastIndex
                           ? "ml-8"

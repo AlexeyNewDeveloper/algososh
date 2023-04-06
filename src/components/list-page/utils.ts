@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { IItemObject } from "../../types/types";
 
+export const MAX_LENGTH: number = 4;
+
 export class Node<T> {
   value: T;
   next: Node<T> | null;
@@ -31,10 +33,10 @@ export class LinkedList<T extends IItemObject> implements ILinkedList<T> {
   constructor(initialList?: Array<any>) {
     this.initialList = initialList;
     this.head = null;
+    this.size = 0;
     if (initialList) {
       this.toLinkedList();
     }
-    this.size = 0;
   }
 
   toLinkedList() {
