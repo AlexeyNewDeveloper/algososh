@@ -1,25 +1,17 @@
-import renderer, { act } from "react-test-renderer";
-import TestRenderer from "react-test-renderer";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  cleanup,
-  waitForElementToBeRemoved,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ElementStates } from "../../types/element-states";
 import { StringComponent } from "./string";
-import { Circle } from "../ui/circle/circle";
 import { BrowserRouter } from "react-router-dom";
+
+const testingComponent = (
+  <BrowserRouter>
+    <StringComponent delayInMs={10} />
+  </BrowserRouter>
+);
 
 describe("Тестирование алгоритма разворота строки", () => {
   it("Корректно разворачивает строку с чётным количеством символов.", async () => {
-    render(
-      <BrowserRouter>
-        <StringComponent delayInMs={10} />
-      </BrowserRouter>
-    );
+    render(testingComponent);
     const input = screen.getByTestId("input");
     const button = screen.getByTestId("button");
     const testValue = "Вода";
@@ -55,11 +47,7 @@ describe("Тестирование алгоритма разворота стр�
   });
 
   it("Корректно разворачивает строку с нечётным количеством символов.", async () => {
-    render(
-      <BrowserRouter>
-        <StringComponent delayInMs={10} />
-      </BrowserRouter>
-    );
+    render(testingComponent);
     const input = screen.getByTestId("input");
     const button = screen.getByTestId("button");
     const testValue = "Земля";
@@ -92,5 +80,32 @@ describe("Тестирование алгоритма разворота стр�
       },
       { timeout: 1000 }
     );
+  });
+
+  it("Корректно разворачивает строку с одним символом.", async () => {
+    render(testingComponent);
+    const input = screen.getByTestId("input");
+    const button = screen.getByTestId("button");
+    const testValue = "В";
+    const reverseTestValueArray = testValue.split("").reverse();
+
+    fireEvent.change(input, { target: { value: testValue } });
+    fireEvent.click(button);
+
+    let resultLetter = screen
+      .getAllByTestId("circle_letter")
+      .map((circle) => circle.textContent);
+
+    expect(resultLetter).toEqual(reverseTestValueArray);
+  });
+
+  it("Корректно разворачивает пустую строку.", async () => {
+    render(testingComponent);
+    const input = screen.getByTestId("input");
+    const button = screen.getByTestId("button");
+    const testValue = "";
+
+    fireEvent.change(input, { target: { value: testValue } });
+    expect(button).toBeDisabled();
   });
 });
