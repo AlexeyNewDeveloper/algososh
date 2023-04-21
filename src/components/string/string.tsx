@@ -13,7 +13,13 @@ import { delay } from "../../utils/utils";
 import { DELAY_IN_MS } from "../../constants/delays";
 import { MAX_LENGTH } from "./utils";
 
-export const StringComponent: React.FC = () => {
+interface IDelayInMs {
+  delayInMs?: number;
+}
+
+export const StringComponent: React.FC<IDelayInMs> = ({ delayInMs }) => {
+  const displayDelay = delayInMs ? delayInMs : DELAY_IN_MS;
+
   const [clickButton, setClickButton] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [displayedItems, setDisplayedItems] = React.useState<{
@@ -73,7 +79,7 @@ export const StringComponent: React.FC = () => {
 
   async function swapString(
     [...str]: Array<IItemObject>,
-    delayNumber: number = DELAY_IN_MS
+    delayNumber: number = displayDelay
   ) {
     let start = 0;
     let end = str.length - 1;
@@ -133,16 +139,18 @@ export const StringComponent: React.FC = () => {
             maxLength={MAX_LENGTH}
             extraClass="mr-12"
             value={values.text ? values.text : ""}
+            data-testid="input"
           />
           <Button
             isLoader={loading}
             onClick={onClickButton}
             text="Развернуть"
             disabled={!values.text}
+            data-testid="button"
           />
         </div>
         {clickButton && (
-          <div className={styles.result_box}>
+          <div className={styles.result_box} data-testid="result_box">
             {displayedItems.items.map((letterObj, index, arr) => {
               const circleState = getCircleStateBasedOn(letterObj);
               return (
