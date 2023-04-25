@@ -1,5 +1,5 @@
-describe("service is available", function () {
-  it("should be available on localhost:3000", function () {
+describe("Доступность приложения", function () {
+  it("Приложение запустилось по адресу localhost:3000", function () {
     cy.visit("http://localhost:3000");
   });
 });
