@@ -121,6 +121,7 @@ export const StackPage: React.FC = () => {
             onClick={addValueButton}
             disabled={!values.text || isPressedButton(clickButton)}
             isLoader={clickButton.add}
+            data-testid="addButton"
           />
           <Button
             text="Удалить"
@@ -131,6 +132,7 @@ export const StackPage: React.FC = () => {
               isPressedButton(clickButton)
             }
             isLoader={clickButton.delete}
+            data-testid="deleteButton"
           />
           <Button
             text="Очистить"
@@ -143,9 +145,10 @@ export const StackPage: React.FC = () => {
               isPressedButton(clickButton)
             }
             isLoader={clickButton.clear}
+            data-testid="clearButton"
           />
         </div>
-        <div className={styles.result_box}>
+        <div className={styles.result_box} data-testid="resultBox">
           {arrayText.displayedTextArray.length
             ? arrayText.displayedTextArray.map((item, index) => {
                 const lastIndex = arrayText.displayedTextArray.length - 1;

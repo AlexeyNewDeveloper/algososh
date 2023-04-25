@@ -1,6 +1,7 @@
 /* eslint-disable jest/valid-expect */
+import { compareValues } from "../support/utils";
 
-describe("Тестирование алгоритма разворота строки", () => {
+describe("Фибоначчи", () => {
   beforeEach(() => {
     cy.visit("http://localhost:3000/fibonacci");
   });
@@ -14,11 +15,6 @@ describe("Тестирование алгоритма разворота стр�
     cy.get("input").type("4");
     cy.get("button").contains("Рассчитать").click();
 
-    cy.get("[data-testid='circle_letter']").should((elements) => {
-      const arrayFromValues = Array.from(elements, (element) => {
-        return element.textContent;
-      });
-      expect(arrayFromValues).eql(["1", "1", "2", "3", "5"]);
-    });
+    compareValues("11235");
   });
 });
