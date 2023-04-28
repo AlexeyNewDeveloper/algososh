@@ -440,6 +440,12 @@
 .mr-40 {
   margin-right: calc(var(--offset-base-size) * 40);
 }
+.mr-52 {
+  margin-right: calc(var(--offset-base-size) * 52);
+}
+.mr-80 {
+  margin-right: calc(var(--offset-base-size) * 80);
+}
 
 .mt-1 {
   margin-top: var(--offset-base-size);
@@ -493,6 +499,9 @@
   margin-top: calc(var(--offset-base-size) * 35);
 }
 .mt-40 {
+  margin-top: calc(var(--offset-base-size) * 40);
+}
+.mt-45 {
   margin-top: calc(var(--offset-base-size) * 40);
 }
 

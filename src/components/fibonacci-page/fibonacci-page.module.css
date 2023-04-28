@@ -1,0 +1,22 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  max-width: 522px;
+  box-sizing: border-box;
+}
+
+.result_box {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(10, auto);
+  row-gap: 78px;
+  column-gap: 16px;
+  margin-top: 48px;
+  max-width: 944px;
+}

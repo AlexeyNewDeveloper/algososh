@@ -1,0 +1,17 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  max-width: 522px;
+  box-sizing: border-box;
+}
+
+.result_box {
+  display: flex;
+  margin-top: 120px;
+}
