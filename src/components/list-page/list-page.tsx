@@ -284,6 +284,7 @@ export const ListPage: React.FC = () => {
             extraClass={`${styles.input} mr-6`}
             value={values.textValue ? values.textValue : ""}
             disabled={isPressedButton(clickButton)}
+            data-testid="inputValue"
           />
           <div className={styles.buttons}>
             <Button
@@ -295,6 +296,7 @@ export const ListPage: React.FC = () => {
               disabled={isPressedButton(clickButton) || !values.textValue}
               isLoader={clickButton.addToHead}
               linkedList="small"
+              data-testid="addToHead"
             />
             <Button
               text="Добавить в tail"
@@ -305,6 +307,7 @@ export const ListPage: React.FC = () => {
               disabled={isPressedButton(clickButton) || !values.textValue}
               isLoader={clickButton.addToTail}
               linkedList="small"
+              data-testid="addToTail"
             />
             <Button
               text="Удалить из head"
@@ -318,6 +321,7 @@ export const ListPage: React.FC = () => {
               }
               isLoader={clickButton.deleteFromHead}
               linkedList="small"
+              data-testid="deleteFromHead"
             />
             <Button
               text="Удалить из tail"
@@ -331,6 +335,7 @@ export const ListPage: React.FC = () => {
               isLoader={clickButton.deleteFromTail}
               extraClass={`${styles.deleteFromTail}`}
               linkedList="small"
+              data-testid="deleteFromTail"
             />
           </div>
         </div>
@@ -352,6 +357,7 @@ export const ListPage: React.FC = () => {
             disabled={isPressedButton(clickButton)}
             type="number"
             max={list.getSize() - 1}
+            data-testid="inputIndex"
           />
           <div className={styles.buttons}>
             <Button
@@ -366,6 +372,7 @@ export const ListPage: React.FC = () => {
               }
               isLoader={clickButton.addByIndex}
               linkedList="big"
+              data-testid="addToIndex"
             />
             <Button
               text="Удалить по индексу"
@@ -381,10 +388,11 @@ export const ListPage: React.FC = () => {
               }
               isLoader={clickButton.deleteByIndex}
               linkedList="big"
+              data-testid="deleteFromIndex"
             />
           </div>
         </div>
-        <div className={styles.result_box}>
+        <div className={styles.result_box} data-testid="resultBox">
           {arrayText.displayedTextArray.length
             ? arrayText.displayedTextArray.map((item, index) => {
                 const lastIndex = arrayText.displayedTextArray.length - 1;

@@ -12,7 +12,17 @@ import { delay } from "../../utils/utils";
 import { getCircleStateBasedOn } from "../../utils/utils";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
-export const SortingPage: React.FC = () => {
+interface IDelayInMs {
+  delayInMs?: number;
+  initialArray?: Array<number>;
+}
+
+export const SortingPage: React.FC<IDelayInMs> = ({
+  delayInMs,
+  initialArray,
+}) => {
+  const displayDelay = delayInMs ? delayInMs : SHORT_DELAY_IN_MS;
+
   const [method, setMethod] = React.useState<{
     choice: boolean;
     bubble: boolean;
@@ -27,15 +37,28 @@ export const SortingPage: React.FC = () => {
   const [clickNewArray, setClickNewArray] = React.useState<boolean>(false);
 
   const randomArr = () => {
-    const lengthArr = Math.floor(Math.random() * (17 - 3 + 1)) + 3;
-    return Array.from({ length: lengthArr }, () => {
-      return {
-        value: String(Math.floor(Math.random() * 101)),
-        id: nanoid(),
-        modified: false,
-        changing: false,
-      };
-    });
+    let lengthArr;
+    if (initialArray) {
+      lengthArr = initialArray.length;
+      return Array.from(initialArray, (value) => {
+        return {
+          value: String(value),
+          id: nanoid(),
+          modified: false,
+          changing: false,
+        };
+      });
+    } else {
+      lengthArr = Math.floor(Math.random() * (17 - 3 + 1)) + 3;
+      return Array.from({ length: lengthArr }, () => {
+        return {
+          value: String(Math.floor(Math.random() * 101)),
+          id: nanoid(),
+          modified: false,
+          changing: false,
+        };
+      });
+    }
   };
 
   const getModifyArray = (
@@ -207,6 +230,7 @@ export const SortingPage: React.FC = () => {
           extraClass="mr-40"
           defaultChecked
           onChange={onChangeRadioInput}
+          data-testid="choice"
         />
         <RadioInput
           name="method"
@@ -214,6 +238,7 @@ export const SortingPage: React.FC = () => {
           label="Пузырёк"
           extraClass="mr-52"
           onChange={onChangeRadioInput}
+          data-testid="bubble"
         />
         <Button
           sorting={Direction.Ascending}
@@ -222,13 +247,14 @@ export const SortingPage: React.FC = () => {
           onClick={() => {
             setClickSortButton("asc");
             if (method.choice) {
-              selectionSort(array, "asc", SHORT_DELAY_IN_MS);
+              selectionSort(array, "asc", displayDelay);
             } else if (method.bubble) {
-              bubbleSort(array, "asc", SHORT_DELAY_IN_MS);
+              bubbleSort(array, "asc", displayDelay);
             }
           }}
           isLoader={clickSortButton === "asc"}
           disabled={clickSortButton === "desc" || !clickSortButton}
+          data-testid="asc"
         />
         <Button
           sorting={Direction.Descending}
@@ -237,22 +263,24 @@ export const SortingPage: React.FC = () => {
           onClick={() => {
             setClickSortButton("desc");
             if (method.choice) {
-              selectionSort(array, "desc", SHORT_DELAY_IN_MS);
+              selectionSort(array, "desc", displayDelay);
             } else if (method.bubble) {
-              bubbleSort(array, "desc", SHORT_DELAY_IN_MS);
+              bubbleSort(array, "desc", displayDelay);
             }
           }}
           isLoader={clickSortButton === "desc"}
           disabled={clickSortButton === "asc" || !clickSortButton}
+          data-testid="desc"
         />
         <Button
           text="Новый массив"
           onClick={getNewArray}
           disabled={clickSortButton === "asc" || clickSortButton === "desc"}
+          data-testid="getNewArray"
         />
       </div>
       {clickNewArray && (
-        <div className={styles.result_box}>
+        <div className={styles.result_box} data-testid="resultBox">
           {array.map((element, index, arr) => {
             const columnState = getCircleStateBasedOn(element);
             return (

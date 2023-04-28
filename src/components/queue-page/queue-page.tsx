@@ -128,6 +128,7 @@ export const QueuePage: React.FC = () => {
               !values.text || isPressedButton(clickButton) || queue.isFilled()
             }
             isLoader={clickButton.add}
+            data-testid="addButton"
           />
           <Button
             text="Удалить"
@@ -135,6 +136,7 @@ export const QueuePage: React.FC = () => {
             onClick={deleteValueButton}
             disabled={queue.isEmpty() || isPressedButton(clickButton)}
             isLoader={clickButton.delete}
+            data-testid="deleteButton"
           />
           <Button
             text="Очистить"
@@ -149,9 +151,10 @@ export const QueuePage: React.FC = () => {
               !(queue.getHeadIndex() === queue.getSize() - 1)
             }
             isLoader={clickButton.clear}
+            data-testid="clearButton"
           />
         </div>
-        <div className={styles.result_box}>
+        <div className={styles.result_box} data-testid="resultBox">
           {arrayText.displayedTextArray.length
             ? arrayText.displayedTextArray.map((item, index) => {
                 const lastIndex = arrayText.displayedTextArray.length - 1;
