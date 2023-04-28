@@ -27,7 +27,7 @@ describe("Тестирование алгоритма разворота стр�
     await waitFor(
       () => {
         let resultLetter = screen
-          .getAllByTestId("circle_letter")
+          .getAllByTestId("circleLetter")
           .map((circle) => circle.textContent);
 
         expect(resultLetter).toEqual(reverseTestValueArray);
@@ -38,7 +38,7 @@ describe("Тестирование алгоритма разворота стр�
     await waitFor(
       () => {
         let circleColorStates = screen
-          .getAllByTestId("circle_color_state")
+          .getAllByTestId("circleColorState")
           .map((circle) => circle.className.split(" ").pop());
         expect(circleColorStates).toEqual(resultTestValueStates);
       },
@@ -63,7 +63,7 @@ describe("Тестирование алгоритма разворота стр�
     await waitFor(
       () => {
         let resultLetter = screen
-          .getAllByTestId("circle_letter")
+          .getAllByTestId("circleLetter")
           .map((circle) => circle.textContent);
 
         expect(resultLetter).toEqual(reverseTestValueArray);
@@ -74,7 +74,7 @@ describe("Тестирование алгоритма разворота стр�
     await waitFor(
       () => {
         let circleColorStates = screen
-          .getAllByTestId("circle_color_state")
+          .getAllByTestId("circleColorState")
           .map((circle) => circle.className.split(" ").pop());
         expect(circleColorStates).toEqual(resultTestValueStates);
       },
@@ -93,7 +93,7 @@ describe("Тестирование алгоритма разворота стр�
     fireEvent.click(button);
 
     let resultLetter = screen
-      .getAllByTestId("circle_letter")
+      .getAllByTestId("circleLetter")
       .map((circle) => circle.textContent);
 
     expect(resultLetter).toEqual(reverseTestValueArray);

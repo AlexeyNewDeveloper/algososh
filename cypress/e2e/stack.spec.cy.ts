@@ -1,7 +1,11 @@
 /* eslint-disable jest/valid-expect */
 
 import { SHORT_DELAY_IN_MS } from "../../src/constants/delays";
-import { compareValues, compareStyles } from "../support/utils";
+import {
+  compareValues,
+  compareStyles,
+  addValueToInput,
+} from "../support/utils";
 
 describe("Стек", () => {
   beforeEach(() => {
@@ -22,8 +26,7 @@ describe("Стек", () => {
   it("Корректное добавление элементов в Стек", () => {
     cy.clock();
 
-    cy.get("@input").type("s");
-    cy.get("@addButton").click();
+    addValueToInput("s");
 
     compareValues("s");
     compareStyles("changing");
@@ -32,8 +35,7 @@ describe("Стек", () => {
 
     compareStyles("default");
 
-    cy.get("@input").type("q");
-    cy.get("@addButton").click();
+    addValueToInput("q");
 
     compareValues("sq");
     compareStyles("default,changing");
@@ -45,10 +47,7 @@ describe("Стек", () => {
   });
 
   it("Корректное удаление элемента из Стека", () => {
-    cy.get("@input").type("q");
-    cy.get("@addButton").click();
-    cy.get("@input").type("s");
-    cy.get("@addButton").click();
+    addValueToInput("q s");
 
     cy.clock();
 
@@ -75,10 +74,7 @@ describe("Стек", () => {
   });
 
   it("Корректная очистка Стека", () => {
-    cy.get("@input").type("q");
-    cy.get("@addButton").click();
-    cy.get("@input").type("s");
-    cy.get("@addButton").click();
+    addValueToInput("q s");
 
     cy.get("@clearButton").click();
 

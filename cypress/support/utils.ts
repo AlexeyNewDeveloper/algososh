@@ -9,7 +9,7 @@ export const compareValues = (
     arrayOfValue = expectedString.split("");
   }
 
-  cy.get("[data-testid='circle_letter']").should((elements) => {
+  cy.get("[data-testid='circleLetter']").should((elements) => {
     const arrayFromValues = Array.from(elements, (element) => {
       return element.textContent;
     });
@@ -19,7 +19,7 @@ export const compareValues = (
 
 export const compareStyles = (expectedStyles: string): void => {
   const arrayFromStyles = expectedStyles.split(",");
-  cy.get("[data-testid='circle_color_state']").should((elements) => {
+  cy.get("[data-testid='circleColorState']").should((elements) => {
     const arrayFromValuesOfClassname = Array.from(elements, (element) => {
       return element.classList.value;
     });
@@ -53,4 +53,38 @@ export const compareHeadOrTail = (
     });
     expect(arrayFromValues).eql(queue);
   });
+};
+
+export const addValueToInput = (
+  values: string,
+  tagInput: string = "@input",
+  tagButton: string = "@addButton"
+): void => {
+  values.split(" ").forEach((value) => {
+    cy.get(`${tagInput}`).type(`${value}`);
+    cy.get(`${tagButton}`).click();
+  });
+};
+
+export const createTestQueue = (qLength: number) => {
+  let initialArray: string[] = Array.from({ length: qLength }, () => "");
+
+  const addToArray = (value: string, index: number): any => {
+    initialArray[index] = value;
+  };
+
+  const clear = () => {
+    return (initialArray = Array.from({ length: qLength }, () => ""));
+  };
+  return {
+    clear,
+    a: (value: string, index: number): any => {
+      if (index < qLength) {
+        addToArray(value, index);
+      }
+    },
+    getResult: () => {
+      return initialArray;
+    },
+  };
 };
