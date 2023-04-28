@@ -9,7 +9,7 @@ import {
 
 describe("Стек", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/stack");
+    cy.visit("/stack");
 
     cy.get("input").as("input");
     cy.get("[data-testid='addButton']").as("addButton");

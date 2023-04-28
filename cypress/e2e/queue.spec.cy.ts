@@ -13,7 +13,7 @@ describe("Очередь", () => {
   let testQueue = createTestQueue(7);
 
   beforeEach(() => {
-    cy.visit("http://localhost:3000/queue");
+    cy.visit("/queue");
 
     cy.get("input").as("input");
     cy.get("[data-testid='addButton']").as("addButton");

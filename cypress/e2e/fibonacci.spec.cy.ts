@@ -3,7 +3,7 @@ import { compareValues } from "../support/utils";
 
 describe("Фибоначчи", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/fibonacci");
+    cy.visit("/fibonacci");
   });
 
   it("Кнопка добавления недоступна при пустом инпуте", () => {

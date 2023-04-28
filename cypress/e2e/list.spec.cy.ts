@@ -4,7 +4,7 @@ import { SHORT_DELAY_IN_MS } from "../../src/constants/delays";
 
 describe("Очередь", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/list");
+    cy.visit("/list");
 
     cy.get("[data-testid='inputValue']").as("inputValue");
     cy.get("[data-testid='inputIndex']").as("inputIndex");

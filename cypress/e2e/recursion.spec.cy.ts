@@ -5,7 +5,7 @@ import { compareValues, compareStyles } from "../support/utils";
 
 describe("Тестирование алгоритма разворота строки", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/recursion");
+    cy.visit("/recursion");
   });
 
   it("Кнопка добавления недоступна при пустом инпуте", () => {

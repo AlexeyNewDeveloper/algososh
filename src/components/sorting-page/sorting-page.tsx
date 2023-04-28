@@ -220,6 +220,12 @@ export const SortingPage: React.FC<IDelayInMs> = ({
     }
   };
 
+  React.useEffect(() => {
+    if (!array.length) {
+      getNewArray();
+    }
+  }, []);
+
   return (
     <SolutionLayout title="Сортировка массива">
       <div className={styles.top_content}>
