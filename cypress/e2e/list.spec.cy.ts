@@ -98,7 +98,7 @@ describe("Очередь", () => {
       cy.get("@circleHead")
         .eq(index)
         .within(() => {
-          cy.get("@circleHead").contains("1");
+          cy.get("@circleLetters").contains("1");
           cy.get("@circleColorState").should((element) => {
             expect(element[0].classList.value).to.match(RegExp("changing"));
           });
